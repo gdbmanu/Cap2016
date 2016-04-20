@@ -203,10 +203,18 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 %\href{http://ctan.org/pkg/authblk}{le paquet \texttt{authblk}}.
 
 \subsection{Extensions}
-Le plongement des données d'entrée dans des espaces de Hilbert à noyaux reproduisants (RKHS) permet d'étendre notre approche au cas des jeux de données non linéairement séparables. 
+Le plongement des données d'entrée dans des espaces de Hilbert à noyaux reproduisants (RKHS) permet d'étendre notre approche aux jeux de données non linéairement séparables. 
 
-Soit $\mathcal{H}$ un espace de Hilbert à noyaux reproduisants dont le produit scalaire est défini à l'aide de la fonction noyau $K$. On note $K(x,.)$ la projection de l'exemplaire $x$ dans $\mathcal{H}$, avec $\forall f \in \mathcal{H}, \langle f,K(x,.)\rangle = f(x) $ . 
+Soit $\mathcal{H}$ un espace de Hilbert à noyaux reproduisants dont le produit scalaire est défini à l'aide de la fonction noyau $\mathcal{K}$. On note $\mathcal{K}(x,.)$ la projection de l'exemplaire $x$ dans $\mathcal{H}$, avec $\forall f \in \mathcal{H}, \langle f,\mathcal{K}(x,.)\rangle_\mathcal{H} = f(x) $.
+ 
 
+Le classifieur est dans ce cadre défini comme un ensemble de fonctions : $\mathcal{F} = \{f^{(1)}, ..., f^{(K)}\}$ avec :
+$$\hat{y} = \arg \max_k f^{(k)}(x)$$
+
+Soit $\mathcal{F}_0=\{0, ..., 0\}$ le classifieur initial. A chaque essai, est mis à jour selon la règle définie précédemment, soit à l'instant $t$~:
+$$\mathcal{F}_t = \{f^{(1)}_t, ..., f^{(K)}_t\}$$
+$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t  \frac {\mathbf{1}_{k=\tilde{y}_{t^\prime}}l_{t^\prime}}{\mathcal{K}(x_{t^\prime},x_{t^\prime})} (2g_{t^\prime} - 1)\mathcal{K}(x_{t^\prime},.)$$
+$$ l_t = [1 + (1-2g_t) f_{t-1}^{(\tilde{y}_t)}(x_t)]_+$$
 %Et évidemment, vous ajoutez ensuite les paquets que vous voulez
 %utiliser, les macros les définitions de théorèmes etc... Nous
 %recommandons le paquet \texttt{hyperref} puisque les documents
