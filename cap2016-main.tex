@@ -80,7 +80,7 @@ où $[.]_+$ retourne l'identité pour les valeurs positives et 0 pour les valeur
 
 La résolution du problème :
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
-où $C$ correspond au paramètre d'élasticité, conduit à la mise à jour~:
+où $C$ correspond au paramètre de raideur, conduit à la mise à jour~:
 $$W_{t} =  W_{t-1} + \frac{l_t}{2\|x_t\|^2 + \frac{1}{2C}} (\Phi(x_t,y_t) - \Phi(x_t,\hat{y}_t))$$
 Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est  borné dans le cas non séparable.  
 
@@ -107,10 +107,10 @@ Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, \
 
 La résolution du problème d'optimisation suivant~:
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
-où $C$ correspond au paramètre d'élasticité, conduit à la mise à jour~:
+où $C$ correspond au paramètre de raideur, conduit à la mise à jour~:
 $$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) \Phi(x_t,\tilde{y}_t)$$
 
-\paragraph{Bandit Passive-Aggressive}
+\paragraph{Bandit Passive-Aggressive (BPA)}
 	%\caption{BPA}
 	\begin{algorithmic}
 		\STATE $\ \ $
@@ -131,13 +131,13 @@ $$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) \Phi(x_t,\t
 
 
 \subsection{Analyse}
-Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$. On démontre les deux théorèmes suivants (en négligeant $C$ pour simplifier) :
+Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$. On démontre les deux théorèmes suivants (en utilisant une raideur $C$ infinie pour simplifier) :
 
 \begin{theorem}
 	\label{theo:BPAT1}
-	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, and $U \in \mathbb{R}^{K\times d}$. Then, the cumulative squared loss of this algorithm is bounded by,
+	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, and $U \in \mathbb{R}^{K\times d}$ such that $ \forall t, l^*_t=0$. Then, the cumulative squared loss of this algorithm is bounded by,
 	\begin{equation}
-	\sum_{t=1}^{T} l_t^2 \leqslant R^2\cdot \parallel{u}\parallel^2
+	\sum_{t=1}^{T} l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2
 	\end{equation}
 \end{theorem}
 
@@ -161,18 +161,31 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 	&- \left\| \frac{l_t}{\parallel{x_t}\parallel^2}\Phi(x_t,\tilde{y}_t)\right\|^2
 	\nonumber
 	\end{align}
-	%With  $l_t = [1+(1-2\1_{(\tilde{y}_t = y_t)})\cdot\langle w_t,\Phi(x_t,\tilde{y}_t)\rangle]_+$  and  $l_t^{\ast} = [1+(1-2\1_{(\tilde{y}_t = y_t)})\cdot\langle u,\Phi(x_t,\tilde{y}_t)\rangle]_+$ ,
-	So, 
+	%With    and   ,
+	So, remarking that~:
+	\begin{itemize}
+		\item[] $l_t = [1+(1-2g_t)\cdot\langle W_{t-1},\Phi(x_t,\tilde{y}_t)\rangle]_+$
+		\item[] $l_t^{\ast} = [1+(1-2g_t)\cdot\langle U,\Phi(x_t,\tilde{y}_t)\rangle]_+$
+		\item[] $\parallel{\Phi(x_t,\tilde{y}_t)}\parallel = \parallel x_t\parallel$
+	\end{itemize}
+	it comes:
 	\begin{align}
-	\Delta_t &= 2\frac{l_t^2 - l_t l_t^{\ast}}{\parallel{x_t}\parallel^2}-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel{\Phi(x_t,\tilde{y}_t)}\parallel \right)^2\nonumber\\
-	&= \frac{l_t^2-2l_t l_t^{\ast}}{\parallel x_t\parallel^2}\nonumber
+	\Delta_t =& 2l_t\frac{(1-2g_t)\langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle - (1-2g_t)\langle U, \Phi(x_t,\tilde{y}_t)\rangle}{\|x_t\|^2} \nonumber\\
+	&-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel{\Phi(x_t,\tilde{y}_t)}\parallel \right)^2\nonumber\\
+	\end{align}
+	Noting that $\Delta_t = 0$ when $l_t = 0$, and $l^*_t \geq  1+(1-2g_t)\cdot\langle U,\Phi(x_t,\tilde{y}_t)\rangle$, it comes : 
+	\begin{align}
+	\geqslant& 2l_t\frac{l_t - l_t^{\ast}}{\parallel{x_t}\parallel^2}-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel x_t\parallel \right)^2\nonumber\\
+	=& \frac{l_t^2-2l_t l_t^{\ast}}{\parallel x_t\parallel^2}\nonumber
 	\end{align}
 	If all examples are separable, $\exists U$ such that $\forall t \in [1,...,T]$ , $l_t^{\ast} = 0$ ,
 	%, following the Eq.~\ref{sumDelta},
 	
-	\[\Rightarrow \parallel{U}\parallel^2 \geqslant \sum_{t=1}^{T}\Delta_t \geqslant \sum_{t=1}^{T}  \frac{l_t^2}{\parallel{x_t}\parallel^2}\]
-	\[\Rightarrow \sum_{t=1}^{T} l_t^2 \leqslant\parallel{U}\parallel^2 \cdot \parallel{\Phi(x_t,\tilde{y}_t)}\parallel^2\]
-	\[\sum_{t=1}^{T} l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2\]
+	\[\Rightarrow \parallel{U}\parallel^2 \geqslant \sum_{t=1}^{T}\Delta_t \geqslant \sum_{t=1}^{T}  \frac{l_t^2}{\parallel{x_t}\parallel^2}
+	\geqslant 
+	\sum_{t=1}^{T}  \frac{l_t^2}{R^2}
+	\]
+	\[\Rightarrow\sum_{t=1}^{T} l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2\]
 \end{proof}
 \begin{theorem}
 	\label{theo:BPAT2}
@@ -181,7 +194,7 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 \end{theorem}
 \begin{proof}
 	By the proof of Theorem \ref{theo:BPAT1}, 
-	\[\sum_{t=1}^{T}l_t^2 \leqslant R^2\cdot \parallel{u}\parallel^2 + 2\sum_{t=1}^{T}l_t l_t^{\ast}\]
+	\[\sum_{t=1}^{T}l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2 + 2\sum_{t=1}^{T}l_t l_t^{\ast}\]
 	To upper bound the right side of the above inequality, we denote $A_t = \sqrt{\sum_{t=1}^{T}l_t^2}$ and $B_t = \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}$, 
 	\begin{align}
 	2(A_tB_t)^2-2(\sum_{t=1}^{T}l_tl_t^{\ast})^2 =& \sum_{i=1}^{T}\sum_{j=1}^{T}l_i^2(l_j^{\ast})^2+\sum_{i=1}^{T}\sum_{j=1}^{T}l_j^2(l_i^{\ast})^2 \nonumber\\
@@ -190,7 +203,7 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 	\end{align}
 	
 	\begin{align}
-	\sum_{t=1}^{T}l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2+2\sum_{t=1}^{T}l_tl_t^{\ast}\leqslant R^2 \cdot \parallel{u}\parallel^2+2A_tB_t
+	\sum_{t=1}^{T}l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2+2\sum_{t=1}^{T}l_tl_t^{\ast}\leqslant R^2 \cdot \parallel{U}\parallel^2+2A_tB_t\nonumber
 	\end{align}
 	%\[L_t^2 -2R^2 L_tU_t+U_t^2\leqslant R^2\parallel{u}\parallel^2+U_t^2\]
 	\[A_t \leqslant B_t+\sqrt{R^2\parallel{U}\parallel^2+B_t^2}\]
@@ -202,6 +215,10 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 %Pour les affiliations, vous pouvez utiliser
 %\href{http://ctan.org/pkg/authblk}{le paquet \texttt{authblk}}.
 
+Les bornes obtenues ici sont comparables  à celles obtenues par Crammer dans le cadre de la classification supervisée  \cite{XXX}. Il est donc remarquable de constater qu'
+
+ 
+
 \subsection{Extensions}
 Le plongement des données d'entrée dans des espaces de Hilbert à noyaux reproduisants (RKHS) permet d'étendre notre approche aux jeux de données non linéairement séparables. 
 
@@ -211,10 +228,42 @@ Soit $\mathcal{H}$ un espace de Hilbert à noyaux reproduisants dont le produit 
 Le classifieur est dans ce cadre défini comme un ensemble de fonctions : $\mathcal{F} = \{f^{(1)}, ..., f^{(K)}\}$ avec :
 $$\hat{y} = \arg \max_k f^{(k)}(x)$$
 
-Soit $\mathcal{F}_0=\{0, ..., 0\}$ le classifieur initial. A chaque essai, est mis à jour selon la règle définie précédemment, soit à l'instant $t$~:
+Soit $\mathcal{F}_0=\{0, ..., 0\}$ le classifieur initial. A chaque essai, il est mis à jour selon la règle définie précédemment, soit à l'instant $t$~:
 $$\mathcal{F}_t = \{f^{(1)}_t, ..., f^{(K)}_t\}$$
-$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t  \frac {\mathbf{1}_{k=\tilde{y}_{t^\prime}}l_{t^\prime}}{\mathcal{K}(x_{t^\prime},x_{t^\prime})} (2g_{t^\prime} - 1)\mathcal{K}(x_{t^\prime},.)$$
+$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t  \frac {\mathbf{1}_{k=\tilde{y}_{t^\prime}}l_{t^\prime}}{\mathcal{K}(x_{t^\prime},x_{t^\prime})+\frac{1}{2C}} (2g_{t^\prime} - 1)\mathcal{K}(x_{t^\prime},.)$$
 $$ l_t = [1 + (1-2g_t) f_{t-1}^{(\tilde{y}_t)}(x_t)]_+$$
+
+En notant $\alpha_t^{(k)} = \frac {\mathbf{1}_{k=\tilde{y}_{t}}l_{t}}{\mathcal{K}(x_{t},x_{t})+\frac{1}{2C}} (2g_{t} - 1)$, il vient :
+$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t \alpha_{t^\prime}^{(k)} \mathcal{K}(x_{t^\prime},.)$$
+
+Autrement dit chaque séparatrice $f^{(k)}$ est définie par un ensemble de vecteurs supports ($x_{t_1^{(k)}}$, ..., $x_{t_i^{(k)}}$, ...  ) tels que $\forall i, \alpha_{t_i^{(k)}}^{(k)} \neq 0$.
+
+
+Le nombre de vecteurs supports augmente de 1 chaque fois que la perte est non nulle. De par le théorème 1, nous savons que nombre est borné dès lors que les données sont séparables dans l'espace de redescription. 
+
+Afin de contrôler plus strictement le nombre de vecteurs supports, nous considérons une approche alternative basée sur la minimisation du risque régularisé par descente de gradient comme proposé dans \cite{XXXKivinen}~:
+$$R(\mathcal{F}) = \mathbb{E}\left[ l_t + \frac{\lambda}{2}\|\mathcal{F}\|^2_\mathcal{H}\right]$$
+On obtient dans ce cas la règle de mise à jour~:
+$$f_t^{(k)}=\left\{
+\begin{array}{l}
+(1-\eta\lambda) f_{t-1}^{(k)} + \eta l_t (2g_t-1) \mathcal{K}(x_t,.) \text{ si } k=\tilde{y}_t\\
+ f_{t-1}^{(k)} \text{ sinon}
+\end{array}
+\right.
+$$
+avec $\eta$ paramètre d'apprentissage et $\lambda$ paramètre de régularisation. En notant 
+$$\sigma_t^{(k)} = \sum_{t^\prime=1}^t
+\mathbf{1}_{\tilde{y}_{t^\prime}=k}$$
+on obtient dans ce cas:
+$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t \alpha_{t^\prime}^{(k)} \mathcal{K}(x_{t^\prime},.)$$
+et
+$$\alpha_{t^\prime}^{(k)} = \mathbf{1}_{\tilde{y}_{t^\prime}=k}(1 - \eta \lambda)^{\sigma_t^{(k)} - \sigma_{t^\prime}^{(k)}-1}  \eta l_{t^\prime} (2g_{t^\prime}-1)$$
+
+Comme proposé par Kivinen, il suffit alors de tronquer la séquence de vecteurs supports servant à définir la séparatrice en éliminant les termes les plus faibles, typiquement les exemplaires tels que $\sigma_{t^\prime}^{(k)} > H$, avec $H$ horizon définissant le nombre maximal de vecteurs supports conservés par séparatrice. Cet artifice borne naturellement le nombre de vecteurs supports du classifieur, en ne considérant que les exemplaires les plus récemment observés (les exemplaires les plus anciens sont ``oubliés'').  Kivinen montre que l'erreur de troncature décroît exponentiellement avec la taille de l'horizon choisi. 
+
+
+  
+
 %Et évidemment, vous ajoutez ensuite les paquets que vous voulez
 %utiliser, les macros les définitions de théorèmes etc... Nous
 %recommandons le paquet \texttt{hyperref} puisque les documents
