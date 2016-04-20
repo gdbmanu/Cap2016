@@ -270,38 +270,51 @@ Comme proposé par Kivinen, il suffit alors de tronquer la séquence de vecteurs
 %recommandons le paquet \texttt{hyperref} puisque les documents
 %\texttt{PDF} seront en ligne si vous avez donné votre accord.
 
-\section{Experiments}
+\section{Expériences}
 
-\subsection{High-dimensional datassets}
+\subsection{Jeux de données de grande dimension}
 \label{subsec:BPAE}
-Here, we evaluate the algorithms over two synthetic and three real world data sets. Their characteristics are summarized in Table~\ref{table:mce}.
+Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthétiques et trois jeu de données réels dont les caractéristiques sont fournies dans la table Table~\ref{table:mce}.
 
 \begin{table}[h]
-	\caption{Summary of the three high-dimensional datasets, including the numbers of instances, features, labels and whether the number of examples in each class are balanced.}
+	\caption{Caractéristiques des cinq jeux jeux de données}
 	\label{table:mce}
 	\begin{center}
-		\begin{tabular}{l l l l l}
-			{\bf Dataset}  & {\bf Instances} & {\bf Features} & {\bf Labels}& {\bf Balanced}\\
+		\begin{tabular}{l l l l}
+			{\bf Jeu}  & {\bf nb ex.} & {\bf dim.} & {\bf K}\\
 			\hline
-			SynSep & $10^5$ 	& 400 	& 9 & Y\\
+			SynSep & $10^5$ 	& 400 	& 9 \\
 			
-			SynNonSep & $10^5$ & 400 	& 9 & Y\\
+			SynNonSep & $10^5$ & 400 	& 9 \\
 			
-			RCV1-v2  & $10^5$ 	& 47236 	& 53 & N\\
+			RCV1-v2  & $10^5$ 	& 47236 	& 53 \\
 			
-			%Letter 	&$2*10^4$	&16	&26	&N\\
+			Pendigits 	& 7494	& 16	& 10	\\
 			
-			%Pen-Based &$1.32*10^4$	&16	&10	&N\\
+			Segment & 2310	& 19	& 7	\\
 		\end{tabular}
 	\end{center}
 \end{table}
 
-\textbf{Data sets}:
-The first data set, denoted by SynSep,  is a 9-class, 400-dimensional synthetic data set of size $10^5$. More details about the method to generate this data set can be found in \cite{kakade2008efficient}. The SynSep  idea is to have a simple simulation of generating a text document. The coordinates represent different words in a small vocabulary of size $400$. We ensure that SynSep is linearly separable. 
+\textbf{Jeux de données}:
+Les 3 premiers jeux de données testent le comportement de l'algorithme dans le cas de données de grande dimension, c'est à dire pour des données susceptibles de provoquer de l'encombrement mémoire avec les approches d'ordre 2 classiques. Il s'agit typiquement de vecteurs de caractéristiques basés sur l'analyse de textes, dont le nombre de caractéristiques peut avoisiner les 50000.
+ 
+Le premier jeu de données, nommé SynSep, est un jeu de données synthétique linéairement séparable, de dimension 400. Il est constitué de 9 classes. Le nombre d'exemplaire généré est $10^5$.
+La méthode de construction de ce jeu de données peut être trouvées dans \cite{kakade2008efficient}. L'idée est d'avoir une simulation simple de données de type document. Les différentes coordonnées représentent des termes d'un petit vocabulaire de taille $400$. 
 
-The second data set, denoted by SynNonSep, is constructed  the same way as  SynSep except that a 5\% label noise is introduced, which makes the data set non-separable. 
+Le second jeu de données, nommé SynNonSep,est construit de la même façon, à l'exception d'u bruit de label à 5\%, ce qui rend le jeu de données non-séparable. 
 
-The third data set is collected from the Reuters RCV1-v2 collection\cite{David04RCV}. The original data set is composed by multi-label instances. So we make some preprocessing likes \cite{RB08a}. First, its label hierarchy is reorganized by mapping the data set to the second level of RCV1 topic hierarchy. The documents that have labels of the third or forth level only are mapped to their parent category of the second level; Second, all multi-labelled instances have been removed. This RCV1-v2 is a 53-class,  47236-dimensional real data set of size $10^5$. 
+Le troisième jeu de données provient de la collection Reuters RCV1-v2 \cite{David04RCV}.
+Le jeu original est constitué d'instances multi-label. Afin d'obtenir un label par instance, nous effectuons le prétraitement proposé par \cite{RB08a}. Le jeu obtenu est constitué de 53-classes, la dimension des vecteurs est 47236 et le nombre d'instances est $10^5$. 
+
+Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires plus faibles. Nous comparons dans ce cas le comportement des algorithmes dans le cas de plongement des données dans des espaces de fonctions noyaux.  
+
+Le quatrième jeu de données, nommé Pendigits, est un jeu de données réel créé pa E.Alpaydin and Fevzi.Alimoglu \cite{alimoglu1996combining,Alimoglu96methodsof}. 
+Il contient des jeux de 250 échantillons d'écriture de 44 sujets. Chaque sujet doit écrire 250 chiffres dans un ordre aléatoire dans sur une tablete numérique de résolution 500 x 500. 
+Here, the dataset is part of original one. It contains 7494 instances, 16 features and 10 classes. 
+
+The second dataset denoted by `Segment'\cite{Lichman:2013}. This dataset contains 2310 instances, all of them were drawn randomly from a database of 7 outdoor images. The images were handsegmented to create a clasification for every pixel. Each instance is a $3\times 3$ region. It's a real dataset, with 19 features and 7 classes. More details could be referred to the data site ``UCI''.
+
 
 %The fourth and fifth data sets are collected from \cite{letter26SC,number10SC}. The fourth data set is to identify each of a large number of black-and-white rectangular pixel displays as one of the 26 capital letters in the English alphabet. The character images were based on 20 different fonts and each letter within these 20 fonts was randomly distorted to produce a file of 20000 unique stimuli. Each stimuli was converted into 16 primitive numerical attributes (statistical moments and edge counts). It forms a 26-class, 16-dimensional real data set of size $20000$. The fifth data set is a digit data base made by collecting 250 samples from 44 writers, using only (x,y) coordinate information represented as constant length feature vectors, which were resampled to 8 points per digit (therefore the data set contains 8 points $\times$ 2 coordinates = 16 features). This one is a 10-class, 16-dimensional real data set of size $10992$.
 
@@ -401,11 +414,6 @@ In this section, we take two datasets to evaluate and analyze the effect of thes
 
 \vspace{1.5ex}
 \textbf{Data description}
-The first dataset denoted by Pendigits, is a real data and created by E.Alpaydin and Fevzi.Alimoglu \cite{alimoglu1996combining,Alimoglu96methodsof}. 
-It  collected 250samples from 44 writers. All writers are asked to write 250 digits in random order inside boxes of 500 by 500 tablet pixel resolution. 
-Here, the dataset is part of original one. It contains 7494 instances, 16 features and 10 classes. 
-
-The second dataset denoted by `Segment'\cite{Lichman:2013}. This dataset contains 2310 instances, all of them were drawn randomly from a database of 7 outdoor images. The images were handsegmented to create a clasification for every pixel. Each instance is a $3\times 3$ region. It's a real dataset, with 19 features and 7 classes. More details could be referred to the data site ``UCI''.
 
 \vspace{1.5ex}
 %\textcolor{red}{OK-- Il faut donner la formule des noyaux lineaire et Laplace}
