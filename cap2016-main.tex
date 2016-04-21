@@ -19,12 +19,11 @@
 
 \bibliographystyle{alpha}
 
-\title{Expression quadratique de l'apprentissage en ligne d'un bandit contextuel}
-\author[1]{Auteur A\thanks{Si vraiment vous voulez mettre votre email
-    ou page web...: A.A@univ-x.fr}}
-\author[2]{Auteur B}
-\affil[1]{Université X, CNRS}
-\affil[2]{Université Y, CNRS et INRIA}
+\title{Optimisation quadratique pour l'apprentissage en ligne d'un bandit contextuel}
+\author[1,2]{Emmanuel Daucé}
+\author[1]{Hongliang Zhong}
+\affil[1]{Ecole Centrale de Marseille, Marseille}
+\affil[2]{Institut de Neurosciences des Systèmes, Aix-Marseille Université, Marseille}
 
 \renewcommand\Authands{, et }
 \renewcommand\Authand{ et }
@@ -32,13 +31,15 @@
 \maketitle
 
 \begin{abstract}
-  Ce style est très simple. Vous pouvez ajouter des mots-clef sous le
-  résumé. Le nombre de pages est limité à 10. 
+  Nous développons un algorithme d'apprentissage en ligne de classifieurs multiclasses dans le cas où l'information de classification apparaît sous une forme binaire (réponse correcte ou incorrecte). L'absence d'information de label explicite conduit à échantillonner de manière aléatoire l'espace de labels, sur le modèle des bandits contextuels. 
+  L'algorithme développé repose  sur l'optimisation à chaque essai d'une fonction de coût spécifique, sur le modèle de l'approche ``Passive Agressive'' proposée par \cite{crammer2006online}. 
+  L'analyse mathématique permet de mettre en évidence des bornes sur la somme des coûts cumulés, à la fois dans le cas séparable et dans le cas non séparable, comparables aux bornes obtenues dans le cas supervisé. 
+  Les expériences numériques confirment le bon comportement de l'algorithme d'apprentissage, à la fois sur des données de grande dimension et sur des jeux de données non-linéairement séparables. 
 \end{abstract}
 
 \medskip
 
-\noindent\textbf{Mots-clef}: Style, \LaTeX, CAP.
+\noindent\textbf{Mots-clef}: Optimisation quadratique, Apprentissage en ligne, Bandit.
 
 \section{Introduction}
 \label{sec:lentete}
@@ -435,7 +436,7 @@ Dans le cas de SynNonSep, le taux de croissance de l'erreur cumulée est linéai
 Enfin, la base Reuters, qui présente le cas de figure le plus réaliste, permet de mettre en évidence les bonnes performances de l'approche BPA. Dans tous les cas, les taux d'erreurs cumulés sont croissants mais la croissance est sous linéaire, indiquant une bon comportement d'apprentissage pour tous les algorithmes. Les deux algorithmes supervisés présentent des performances comparables, avec un taux d'erreurs cumulées légèrement plus faible  que confidit et BPA, et des pentes finales à peu près comparables. Le résultat le plus saisissant ici est de constater les performances des algorithmes BPA et Confidit, très proches de celles des algorithmes supervisés malgré le nombre de classes élevé (53). Le taux d'erreurs cumulées se révèle par ailleurs un peu plus favorable pour BPA que pour Confidit, ce qui est également notable étant donnée la moindre complexité algorithmique de l'algorithme BPA \footnote{L'algorithme Confidit nécessite en effet une estimation de la covariance des échantillons, cette matrice de covariance étant réduite en haute dimension à une simple diagonale.}. Seul l'algorithme du Banditron semble encore une fois présenter une performance d'apprentissage significativement plus faible. 
 
 
-Dans le cas de jeux de données de petite dimension, nous comparons le comportement des algorithmes dans el cas du plongement des données dans des espaces de fonctions noyaux. Nous notons ainsi KBanditron le Banditron à noyaux, KBPA le Bandit Passif Agressif à noyaux et KSGD l'approche basée sur la descente de gradient régularisée présenté dans la partie 2.3. Nous ne présentons pas ici l'algorithme Confidit pour lequel la généralisation aux espaces de fonctions noyaux est moins directe. 
+Dans le cas de jeux de données de petite dimension, nous comparons le comportement des algorithmes dans le cas du plongement des données dans des espaces de fonctions noyaux. Nous notons ainsi KBanditron le Banditron à noyaux, KBPA le Bandit Passif Agressif à noyaux et KSGD l'approche basée sur la descente de gradient régularisée présenté dans la partie 2.3. Nous ne présentons pas ici l'algorithme Confidit pour lequel la généralisation aux espaces de fonctions noyaux est moins directe. 
 
 La fonction noyau utilisée dans ce cadre est la fonction de Laplace, soit~:
 \[K_{Laplace}(x,y) = \exp{\left(-\frac{\parallel{x-y}\parallel}{\sigma}\right)}\]
@@ -515,19 +516,20 @@ Les figures  \ref{pic:PKCM}, \ref{pic:PKM}, \ref{pic:SKCM} et \ref{pic:SKM}  pr�
 {Conclusion}
 \label{subsec:BPAC}
 
-Nous avons proposé dans cet article un nouvel algorithme d'apprentissage en ligne de classifieurs multiclasses adaptés au cas où l'information de classification se présente sous une forme binaire (on parle de feedback de bandit). Nous développons une approche fondée sur l'optimisation à chaque essai d'une fonction de coût spécifique au problème, sur le modèle de l'approche ``Passive Agressive'' proposée par \cite{crammer2006online}. 
+Nous avons proposé dans cet article un nouvel algorithme d'apprentissage en ligne de classifieurs multiclasses dans le cas où l'information de classification est sous une forme binaire (réponse correcte ou incorrecte). L'absence d'information de label explicite conduit à échantillonner de manière aléatoire l'espace de labels, sur le modèle des bandits contextuels. L'approche utilisée ici pour l'exploration est $\varepsilon$-glouton, soit une alternance entre échantillonage uniforme et exploitation. 
 
-We proposed a novel algorithm for online multiclass classification with bandit feedback. By the advantage of PA max-margin principle, BPA appears effective to address the bandit online learning setting. Its main advantage is its linear complexity in space that allows to deal with high dimensional data sets and a large number of classes, on the contrary to second-order methods. The practicability of this algorithm is verified theoretically by showing a competitive loss bound.
+L'algorithme développé repose  sur l'optimisation à chaque essai d'une fonction de coût spécifique, sur le modèle de l'approche ``Passive Agressive'' proposée par \cite{crammer2006online}. 
+L'analyse mathématique permet de mettre en évidence des bornes sur la somme des coûts cumulés, à la fois dans le cas séparable et dans le cas non séparable, comparables aux bornes obtenues dans le cas supervisé.
 
-Moreover, experimental evaluation shows that BPA performs better than other algorithms on  real datasets, even better than the algorithms with full feedback on the data sets non-separable.
+Les expériences numériques confirment le bon comportement de l'algorithme d'apprentissage, à la fois sur des données de grande dimension et sur des jeux de données non-linéairement séparables. Tous en présentant une complexité algorithmique similaire, notre approche dépasse systématiquement les performances de l'algorithme du Banditron \cite{kakade2008efficient}. En particulier, nous montrons numériquement une insensibilité des performances au taux d'exploration $\varepsilon$, c'est à dire aussi performant dans le cas d'une échantillonnage pur que dans le cas d'une exploitation systématique de la réponse du classifieur. Cette propriété  permet en conditions réelles d'envisager une implémentation de l'algorithme avec un $\varepsilon$ décroissant au cours de l'apprentissage.    
 
-- nb de classes élevé
-- grande taille
-- parimonie
+Les courbes d'apprentissage montrent des performances similaires aux méthodes d'ordre 2, tout en présnetant une complexité linéaire en espace. 
+Cette complexité faible permet en particulier d'appliquer aisément cette approche aux données de grande dimension. Les expériences montrent également un bon comportement dans le cas où le nombre de classes est assez élevé (ici 53 classes dans le cas de la base Reuters).  
+Dans le cas où les données ne sont pas linéairement séparables, l'algorithme présente une bonne parcimonie, permettant d'éviter une croissance trop importante du nombre de vecteurs supports au cours de l'apprentissage.
 
-la conclusion est qu’une information minimale (binaire) offre des capacites de convergence comparable en ordre de grandeur à une information complète.
 
-role de epsilon
+Plus généralement, ces résultats illustrent le fait qu'une information de classification minimale (ici binaire) se révèle suffisante pour un apprentissage multi-classes performant, offrant en particulier des bornes de convergence comparable en ordre de grandeur à celles reposant sur une information de classification complète.
+
 
 \bibliography{cap2016}
 
