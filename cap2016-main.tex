@@ -31,15 +31,15 @@
 \maketitle
 
 \begin{abstract}
-  Nous développons un algorithme d'apprentissage en ligne de classifieurs multiclasses dans le cas où l'information de classification apparaît sous une forme binaire (réponse correcte ou incorrecte). L'absence d'information de label explicite conduit à échantillonner de manière aléatoire l'espace de labels, sur le modèle des bandits contextuels. 
-  L'algorithme développé repose  sur l'optimisation à chaque essai d'une fonction de coût spécifique, sur le modèle de l'approche ``Passive Agressive'' proposée par \cite{crammer2006online}. 
+  Nous développons un algorithme d'apprentissage en ligne de classifieurs multiclasses dans le cas où l'information de classification apparaît sous une forme binaire (réponse correcte ou incorrecte). L'absence d'information de label explicite conduit à échantillonner de manière aléatoire l'espace des labels, sur le modèle des bandits contextuels. 
+  L'algorithme développé repose  sur l'optimisation à chaque essai d'une fonction de coût, sur le modèle de l'approche ``Passive Agressive'' proposée par \cite{crammer2006online}. 
   L'analyse mathématique permet de mettre en évidence des bornes sur la somme des coûts cumulés, à la fois dans le cas séparable et dans le cas non séparable, comparables aux bornes obtenues dans le cas supervisé. 
   Les expériences numériques confirment le bon comportement de l'algorithme d'apprentissage, à la fois sur des données de grande dimension et sur des jeux de données non-linéairement séparables. 
 \end{abstract}
 
 \medskip
 
-\noindent\textbf{Mots-clef}: Optimisation quadratique, Apprentissage en ligne, Bandit.
+\noindent\textbf{Mots-clef}: Optimisation quadratique, Apprentissage en ligne, Bandit, RKHS.
 
 \section{Introduction}
 \label{sec:lentete}
