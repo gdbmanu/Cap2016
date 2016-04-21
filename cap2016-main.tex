@@ -59,9 +59,9 @@ Ainsi, si on considère une séquence de $T$ expériences, le regret se définit
 $$R_t = \mathbb{E} \sum_{t=1}^T g_t^* - g_t$$
 où $g_t^*$ est le gain obtenu en appliquant la politique optimale et $g_t$ le gain obtenu par l'algorithme d'apprentissage.
 
-Les problèmes de bandit simples se généralisent au cas des bandits dits contextuels \cite{XXX}. Un problème de bandit contextuel est également défini par un univers et un apprenant. L'univers est constitué par des couples (contexte, distribution). Autrement dit, à chaque contexte distinct correspond une distribution de gains distincte sur l'ensemble des $K$ bras. On peut rajouter une hypothèse supplémentaire selon laquelle à des contextes proches correspondent des distributions proches. Le lien avec les problèmes de classification se fait naturellement en considérant des contextes décrits sur des espaces vectoriels, et des catégories décrites par une distribution de gains sur $K$ bras. Dans le cas que nous considérons, à tout contexte $x$ correspond une étiquette unique $y \in \{1,...,K\}$. Autrement dit, en présence de l'exemple $x$, choisir le bras $y$ apporte un gain positif ($g=1$). Pour tout autre choix, le gain est nul ($g=0$). Une expérience consiste ici, en présence du contexte $x$, à choisir une réponse $\tilde{y} \in \{1,...,K\}$. Si $\tilde{y} = y$, le gain vaut 1 sinon il vaut 0. On note $\mathbf{1}_{\tilde{y} = y}$ le gain obtenu dans le cadre de cette expérience. 
+Les problèmes de bandit simples se généralisent au cas des bandits dits contextuels \cite{langford2008epoch}. Un problème de bandit contextuel est également défini par un univers et un apprenant. L'univers est constitué par des couples (contexte, distribution). Autrement dit, à chaque contexte distinct correspond une distribution de gains distincte sur l'ensemble des $K$ bras. On peut rajouter une hypothèse supplémentaire selon laquelle à des contextes proches correspondent des distributions proches. Le lien avec les problèmes de classification se fait naturellement en considérant des contextes décrits sur des espaces vectoriels, et des catégories décrites par une distribution de gains sur $K$ bras. Dans le cas que nous considérons, à tout contexte $x$ correspond une étiquette unique $y \in \{1,...,K\}$. Autrement dit, en présence de l'exemple $x$, choisir le bras $y$ apporte un gain positif ($g=1$). Pour tout autre choix, le gain est nul ($g=0$). Une expérience consiste ici, en présence du contexte $x$, à choisir une réponse $\tilde{y} \in \{1,...,K\}$. Si $\tilde{y} = y$, le gain vaut 1 sinon il vaut 0. On note $\mathbf{1}_{\tilde{y} = y}$ le gain obtenu dans le cadre de cette expérience. 
 
-Le lien entre ce problème et les problèmes de classification linéaire a été proposé par Kakade \cite{XXX}. Dans le cas de la classification linéaire, des hyperplans séparateurs $w_1, ..., w_K$ définissent les frontières entre les différentes classes dans l'espace des exemplaires.  
+Le lien entre ce problème et les problèmes de classification linéaire a été proposé par Kakade \cite{kakade2008efficient}. Dans le cas de la classification linéaire, des hyperplans séparateurs $w_1, ..., w_K$ définissent les frontières entre les différentes classes dans l'espace des exemplaires.  
 Si $x$ est un exemplaire, $\langle w_1, x \rangle > 0$ signifie que $x$ appartient à la classe 1, et $\langle w_1, x \rangle < 0$ qu'il n'appartient pas à la classe 1. Si $x$ est un exemplaire inconnu, on définit généralement la réponse du classifieur comme~:
 $$\hat{y} = \arg \max_{k \in\{1,..,K\}}  \langle w_k, x \rangle$$
  
@@ -69,10 +69,10 @@ Dans le cadre de l'algorithme ``Banditron'', Kakade propose donc d'apprendre ces
 $$ W_t = W_{t-1} + \frac{\mathbf{1}_{\tilde{y}_t = y_t} \Phi(x_t,\tilde{y}_t)}{P(\tilde{Y}=\tilde{y}_t)} - \Phi(x_t,\hat{y}_t)$$   
 avec $\Phi(x_t,k) = (0, ..., 0,  x_t, 0, .., 0)$ une séquence de vecteurs nuls, excepté à la position $k$ où l'on trouve l'exemplaire $x_t$. Kakade montre que son algorithme converge en espérance vers le classifieur du perceptron, et obtient des garanties sur les bornes d'erreur de son algorithme. 
 
-Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Gentile \cite{XXX}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{XXX}, et présentant des profils de convergence plus favorables que le Banditron. 
+Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. 
 
 
-Dans le cas linéairement séparable, l'apprentissage en ligne d'un perceptron multi-classes peut être significativement accéléré en utilisant les principes de l'optimisation quadratique tels que proposés par Vapnik \cite{XXX}. Dans un article récent, Crammer et al \cite{XXX} proposent une méthode d'apprentissage en ligne supervisée reposant sur l'optimisation locale de la fonction de perte ``hinge loss'' définie dans le cadre multi-classe comme : 
+Dans le cas linéairement séparable, l'apprentissage en ligne d'un perceptron multi-classes peut être significativement accéléré en utilisant les principes de l'optimisation quadratique tels que proposés par Vapnik \cite{vapnik1998statistical}. Dans un article récent, Crammer et al \cite{crammer2006online} proposent une méthode d'apprentissage en ligne supervisée reposant sur l'optimisation locale de la fonction de perte ``hinge loss'' définie dans le cadre multi-classe comme : 
 $$
 	 l_t =[\mathbf{1}_{\hat{y}_t\neq y_t} + \langle W_{t-1}, \Phi(x_t,y_t)- \Phi(x_t,\hat{y}_t)\rangle]_+ 
 $$
@@ -131,7 +131,7 @@ $$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) \Phi(x_t,\t
 
 
 \subsection{Analyse}
-Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$. On démontre les deux théorèmes suivants (en utilisant une raideur $C$ infinie pour simplifier) :
+Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$. On démontre les deux théorèmes suivants (en négligeant la constante de raideur $C$ pour simplifier) :
 
 \begin{theorem}
 	\label{theo:BPAT1}
@@ -218,7 +218,7 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 %Pour les affiliations, vous pouvez utiliser
 %\href{http://ctan.org/pkg/authblk}{le paquet \texttt{authblk}}.
 
-Les bornes obtenues ici sont comparables  à celles obtenues par Crammer dans le cadre de la classification supervisée  \cite{XXX}. En particulier, comme dans le cas de l'algorithme ``passif-agressif'' de Crammer, on peut s'attendre à un regret de l'ordre de $O(\sqrt{T})$ dans le cas non-linéairement séparable. Il est donc remarquable de constater que les garanties de convergences de notre algorithme sont les mêmes que dans le cas supervisé, étant donnée la moindre information utilisée et le caractère stochastique de la fonction de décision. On notera néanmoins le caractère plus ``faible'' de la fonction de perte utilisée, de sorte que nos résultats ne garantissent pas que la bonne réponse sera atteinte, mais seulement que la mauvaise réponse ne sera pas atteinte.
+Les bornes obtenues ici sont comparables  à celles obtenues par Crammer dans le cadre de la classification supervisée  \cite{crammer2006online}. En particulier, comme dans le cas de l'algorithme ``passif-agressif'' de Crammer, on peut s'attendre à un regret de l'ordre de $O(\sqrt{T})$ dans le cas non-linéairement séparable. Il est donc remarquable de constater que les garanties de convergences de notre algorithme sont les mêmes que dans le cas supervisé, étant donnée la moindre information utilisée et le caractère stochastique de la fonction de décision. On notera néanmoins le caractère plus ``faible'' de la fonction de perte utilisée, de sorte que nos résultats ne garantissent pas que la bonne réponse sera atteinte, mais seulement que la mauvaise réponse ne sera pas atteinte.
 
 \subsection{Extensions}
 Le plongement des données d'entrée dans des espaces de Hilbert à noyaux reproduisants (RKHS) permet d'étendre notre approche aux jeux de données non linéairement séparables. 
@@ -242,7 +242,7 @@ Autrement dit chaque séparatrice $f^{(k)}$ est définie par un ensemble de vect
 
 Le nombre de vecteurs supports augmente de 1 chaque fois que la perte est non nulle. De par le théorème 1, nous savons que nombre est borné dès lors que les données sont séparables dans l'espace de redescription. 
 
-Afin de contrôler plus strictement le nombre de vecteurs supports, nous considérons une approche alternative basée sur la minimisation du risque régularisé par descente de gradient comme proposé dans \cite{XXXKivinen}~:
+Afin de contrôler plus strictement le nombre de vecteurs supports, nous considérons une approche alternative basée sur la minimisation du risque régularisé par descente de gradient comme proposé dans \cite{kivinen2004online}~:
 $$R(\mathcal{F}) = \mathbb{E}\left[ l_t + \frac{\lambda}{2}\|\mathcal{F}\|^2_\mathcal{H}\right]$$
 On obtient dans ce cas la règle de mise à jour~:
 $$f_t^{(k)}=\left\{
@@ -272,12 +272,12 @@ Comme proposé par Kivinen, il suffit alors de tronquer la séquence de vecteurs
 
 \section{Expériences}
 
-\subsection{Jeux de données de grande dimension}
+\subsection{Jeux de données et paramètres}
 \label{subsec:BPAE}
 Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthétiques et trois jeu de données réels dont les caractéristiques sont fournies dans la table Table~\ref{table:mce}.
 
 \begin{table}[h]
-	\caption{Caractéristiques des cinq jeux jeux de données}
+	\caption{Caractéristiques des cinq jeux de données}
 	\label{table:mce}
 	\begin{center}
 		\begin{tabular}{l l l l}
@@ -296,57 +296,109 @@ Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthéti
 	\end{center}
 \end{table}
 
-\textbf{Jeux de données}:
+\paragraph{Jeux de données}
 Les 3 premiers jeux de données testent le comportement de l'algorithme dans le cas de données de grande dimension, c'est à dire pour des données susceptibles de provoquer de l'encombrement mémoire avec les approches d'ordre 2 classiques. Il s'agit typiquement de vecteurs de caractéristiques basés sur l'analyse de textes, dont le nombre de caractéristiques peut avoisiner les 50000.
  
-Le premier jeu de données, nommé SynSep, est un jeu de données synthétique linéairement séparable, de dimension 400. Il est constitué de 9 classes. Le nombre d'exemplaire généré est $10^5$.
-La méthode de construction de ce jeu de données peut être trouvées dans \cite{kakade2008efficient}. L'idée est d'avoir une simulation simple de données de type document. Les différentes coordonnées représentent des termes d'un petit vocabulaire de taille $400$. 
+Le premier jeu de données, nommé SynSep, est un jeu de données synthétique linéairement séparable, qui simule de façon simplifiée des données de type document.  Les différentes coordonnées représentent des termes d'un petit vocabulaire de taille $400$. Il est constitué de 9 classes. Le nombre d'exemplaire généré est $10^5$.
+La méthode de construction de ce jeu de données peut être trouvées dans \cite{kakade2008efficient}. 
 
-Le second jeu de données, nommé SynNonSep,est construit de la même façon, à l'exception d'u bruit de label à 5\%, ce qui rend le jeu de données non-séparable. 
+Le second jeu de données, nommé SynNonSep,est construit de la même façon, à l'exception d'un bruit de label à 5\%, ce qui rend le jeu de données non-séparable. 
 
 Le troisième jeu de données provient de la collection Reuters RCV1-v2 \cite{David04RCV}.
 Le jeu original est constitué d'instances multi-label. Afin d'obtenir un label par instance, nous effectuons le prétraitement proposé par \cite{RB08a}. Le jeu obtenu est constitué de 53-classes, la dimension des vecteurs est 47236 et le nombre d'instances est $10^5$. 
 
-Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires plus faibles. Nous comparons dans ce cas le comportement des algorithmes dans le cas de plongement des données dans des espaces de fonctions noyaux.  
+Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires également plus faible. Nous comparons dans ce cas les différents algorithmes en plongeant les données dans des espaces de fonctions noyaux.  
 
-Le quatrième jeu de données, nommé Pendigits, est un jeu de données réel créé pa E.Alpaydin and Fevzi.Alimoglu \cite{alimoglu1996combining,Alimoglu96methodsof}. 
-Il contient des jeux de 250 échantillons d'écriture de 44 sujets. Chaque sujet doit écrire 250 chiffres dans un ordre aléatoire dans sur une tablete numérique de résolution 500 x 500. 
-Here, the dataset is part of original one. It contains 7494 instances, 16 features and 10 classes. 
+Le quatrième jeu de données, nommé Pendigits, est un jeu de données réel créé pa E. Alpaydin and F. Alimoglu \cite{alimoglu1996combining,Alimoglu96methodsof}. 
+Il contient 7494 instances, avec 16 caractéristiques par instance et 10 classes. 
 
-The second dataset denoted by `Segment'\cite{Lichman:2013}. This dataset contains 2310 instances, all of them were drawn randomly from a database of 7 outdoor images. The images were handsegmented to create a clasification for every pixel. Each instance is a $3\times 3$ region. It's a real dataset, with 19 features and 7 classes. More details could be referred to the data site ``UCI''.
+Le cinquième jeu de données appelé `Segment' \cite{Lichman:2013} contient 2310 instances, chacune d'elle étant un extrait d'images naturelles basé sur des régions de 3x3 pixels, avec 19 caractéristiques et 7 classes. 
 
 
 %The fourth and fifth data sets are collected from \cite{letter26SC,number10SC}. The fourth data set is to identify each of a large number of black-and-white rectangular pixel displays as one of the 26 capital letters in the English alphabet. The character images were based on 20 different fonts and each letter within these 20 fonts was randomly distorted to produce a file of 20000 unique stimuli. Each stimuli was converted into 16 primitive numerical attributes (statistical moments and edge counts). It forms a 26-class, 16-dimensional real data set of size $20000$. The fifth data set is a digit data base made by collecting 250 samples from 44 writers, using only (x,y) coordinate information represented as constant length feature vectors, which were resampled to 8 points per digit (therefore the data set contains 8 points $\times$ 2 coordinates = 16 features). This one is a 10-class, 16-dimensional real data set of size $10992$.
 
-\textbf{Results}
-Figures \ref{pic:BPASS} and~\ref{pic:BPASNS} show the experimental results on two synthetic data sets. For SynSep, a separable linear data set, all algorithms except Banditron obtain a good performance; with the non-separable SynNonSep data, Confidit and BPA outperform the other algorithms, even the supervised algorithms.  To different datasets, the parameters of different algorithms refer to Table~\ref{table:bpa}.
+Les paramètres utilisés dans les différentes simulations sont donnés dans la table 2. Ces paramètres ont été choisis par validation croisée sur le taux de classification final, afin de comparer de manière fiable les différentes méthodes utilisées. 
+
+
 \begin{table}[h]
-	\caption{The summary of algorithm parameters for different datasets. P. denotes Perceptron, PA is Passive-Aggressive online algorithm, B. is Banditron, C. is Confidit and BPA.}
+	\caption{Paramètres utilisés pour les différents jeux de données. Pour les en-têtes de colonne, P. désigne le Perceptron, PA désigne le Passif Agressif, B désigne le Banditron Banditron, C désigne le Confidit, BPA est le Bandit Passif Agressif, KP est le Kernel Perceptron, KBPA est le Kernel BPA et KSGD est le gradient stochastique à noyaux. Pour les en-têtes de lignes, SS désigne SynSep, SN SynNonSep, R Reuters, P Pendigits et S Segment.}
 	\label{table:bpa}
-	\begin{center}
-		\begin{tabular}{lllllll}
-			{\bf Dataset}  & {\bf P.} & {\bf PA } & {\bf B.}& {\bf C.} & {\bf BPA}\\
+	\vspace{.3cm}
+	\begin{small}
+	
+	%\begin{center}
+		\hspace{-.5cm}
+		\begin{tabular}{llllll}
+			
 			\hline
-			SynSep & null & $C=0$ & $\varepsilon = 0.014$ &$\eta = 10^3$ & $\varepsilon = 0.4,C = 0$\\
+			{\bf }  & {\bf P} & {\bf PA } & {\bf B}& {\bf C} & {\bf BPA}\\
+			\hline
+			SS & $\varnothing$ & $C=0$ & $\varepsilon = 0.014$ &$\eta = 10^3$ & $\varepsilon = 0.4$\\
+			&&&&& $C = \infty$\\
 			
-			SynNonSep & null & $C=10^{-2}$ & $\varepsilon =0.65$ & $\eta = 10^3$& $\varepsilon = 0.8,C = 10^{-2}$\\
-			
-			Reuters & null & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2,C = 10^{-2}$\\
-			
+			SN & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.65$ & $\eta = 10^3$& $\varepsilon = 0.8$\\
+			&&&&& $C = 10^{-2}$\\			
+			R & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
+			&&&&& $C = 10^{-2}$\\
+			\hline
+			&{\bf KP} & {\bf BPA} & {\bf KBPA} &{\bf KSGD}\\
+			\hline
+			P & $\sigma = 1$ & $C = 10^{-2}$ &$\sigma = 1$&$\sigma = 1$\\
+			&&$\varepsilon = 0.2$& $C = 1$ & $H = 500$\\
+			&&& $\varepsilon = 0.2$ &\\
+			S & $\sigma = 10$ & $C = 10^{-2}$ & $\sigma = 10$&$\sigma = 10$\\
+			&&$\varepsilon = 0.2$& $C = 1$& $H = 200$\\
+			&&& $\varepsilon = 0.2$ &
 			%LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
 			
 			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
 			
 		\end{tabular}
-	\end{center}
+	%\end{center}
+	\end{small}
 \end{table}
 
-%\textcolor{red}{OK-- Il manque les valeurs des paramètres pour les différents algorithmes (faire un tableau comme dans la partie précédente).}
+\subsection{Resultats}
 
-Figure~\ref{pic:BPARCV} %, ~\ref{pic:BPALR10} and~\ref{pic:BPALR26} 
-presents the result on the real dataset. With this dataset, the supervised algorithms, despite their competitive advantage with respect to the ones with bandit feedback, do not significantly depart from BPA and Confidit, with classification results that clearly outperform Banditron. While having a lower computational complexity, BPA approach is even found to outperform Confidit in the most challenging situation, i.e. the high-dimensional case with a large number of classes (RCV1-v2 data set).
+Tous les algorithmes comparés sont des algorithmes d'apprentissage en ligne. Le classifieur est donc mis à jour après chaque essai et évolue continuellement au cours de la session d'apprentissage. Chaque exemplaire n'est présenté qu'une seule fois. L'apprentissage du classifieur démarre dès la présentation du premier exemplaire et s'achève dès la présentation du dernier exemplaire. Pour chaque exemplaire présenté, on mesure la réussite sous forme d'erreur $\mathbf{1}_{\hat{y}_t\neq y_t}$ ou de perte $l_t$. 
 
-The $\epsilon$ parameter represents the exploration rate in Banditron and BPA algorithms. We compare on Figure 3 the average error rates obtained on the two algorithms for different values of $\epsilon$ on the different data sets. In contrast with Banditron, BPA shows that $\epsilon$ has a very little influence on the final error rate, indicating a capability to deal with small exploration rates.
+Les algorithmes du Perceptron et Passif-Agressif sont des algorithmes \emph{supervisés}. Ils disposent donc d'une information de classification plus riche que les algorithmes Banditron, Confidit et Bandit Passif-Agressif qui ne disposent que d'une information de type bandit (autrement dit binaire pour un problème à $K$ classes)
+
+Les mesures utilisées pour comparer les algorithmes sont le taux d'erreur cumulé et le taux d'erreur moyen. Le taux d'erreur cumulé se définit à chaque essai $t$ comme le nombre d'erreurs jusqu'à $t$, soit:
+$$M_t = \sum_{t'=1}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}} $$
+Le taux d'erreur moyen, calculé par fenêtre de 100 essais, permet d'estimer plus précisément l'évolution des performances des algorithmes au cours de l'apprentissage:
+$$\bar{m}_t = \frac{1}{100} \sum_{t'=t - 99}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}}$$
+  
+Dans le cas du Banditron et du Bandit Passif-Agressif qui utilisent une politique d'exploration $\varepsilon$-glouton, le choix effectif $\tilde{y}_t$ diffère de $\hat{y}_t$ dans une proportion égale à $\varepsilon$. Une erreur résiduelle subsiste donc nécessairement, même lorsque le classifieur sépare correctement les données. Pour l'évaluation, nous considérons l'erreur de classification et non l'erreur effective, autrement dit nous négligeons l'erreur d'exploration des algorithmes de Banditron et de Bandit Passif Agressif, afin de comparer de manière équitable les caractéristiques des classifieurs calculés par les différents algorithmes.
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width=\linewidth]{figs/SynNonSep_gamma.eps}}
+	\caption{Taux d'erreur moyen du Banditron et du BPA en fonction du taux d'exploration $\varepsilon$ sur le jeu de données SynNonSep. }
+	\label{pic:BPASNSerr}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width=\linewidth]{figs/Reuters_gamma.eps}}
+	\caption{Taux d'erreur moyen du Banditron et du BPA en fonction du taux d'exploration $\varepsilon$ sur le jeu de données Reuters.}
+	\label{pic:BPARCVerr}
+\end{figure}
+
+Les figures \ref{pic:BPASNSerr} et  \ref{pic:BPARCVerr}  présentent l'effet du paramètre d'exploration $\varepsilon$ sur les taux d'erreur obtenus en fin de session par le Banditron et le BPA, sur les bases SynNonSep et Reuters. Contrairement au Banditron, le taux de réussite du BPA est remarquablement insensible à la valeur de $\epsilon$. Autrement dit, les performances d'apprentissage sont les mêmes pour un $\varepsilon$ faible que pour un $\varepsilon$ élevé. Ce résultat permet d'envisager la mise en place de politiques à taux d'exploration variable, afin de de profiter en fin d'apprentissage des bonnes performances du classifieur.
+Par ailleurs, dans les deux cas, le taux d'erreurs obtenu par BPA est supérieur à celui obtenu par le Banditron en fin de session. 
+
+
+\begin{figure}[h!]
+	
+	\centerline{
+		\includegraphics[width=\linewidth]{figs/regret.eps}
+	}
+	\caption{Regret estimé sur le jeu de données Reuters pour l'algorithme BPA}
+	\label{pic:regret}
+\end{figure}
+
+La figure \ref{pic:regret} donne une estimation du regret cumulé sur la base Reuters pour les 10000 premiers exemplaires, pour l'algorithme BPA, en utilisant pour la comparaison le classifieur obtenu en fin de session. On observe un taux de croissance du regret cumulé sous-linéaire, compatible avec la prédiction $O(\sqrt{t})$ (voir théorème 2). 
 
 
 \begin{figure}[h!]
@@ -372,79 +424,47 @@ The $\epsilon$ parameter represents the exploration rate in Banditron and BPA al
 	\label{pic:BPARCV}
 \end{figure}
 
-\begin{figure}[h!]
-	\centerline{
-		\includegraphics[width=\linewidth]{figs/10LR.eps}}
-	\caption{Cumulative Errors on the real data set of Letter Recognition (10 numbers).}
-	\label{pic:BPALR10}
-\end{figure}
+Les figures \ref{pic:BPASS}, \ref{pic:BPASNS} et \ref{pic:BPARCV} comparet les algorithmes Perceptron, Passif-Agressif (PA), Banditron, Confidit et Bandit-Passif Agressif (BPA) sur les jeux de données de grande dimension SynSep, SynNonSep, et Reuters. 
 
-\begin{figure}[h!]
-	\centerline{
-		\includegraphics[width=\linewidth]{figs/26LR.eps}}
-	\caption{Cumulative Errors  on the real data set of Letter Recognition (26 Letters).}
-	\label{pic:BPALR26}
-\end{figure}
+Sur le premier jeu synthétique et linéairement séparable, on constate que la borne est rapidement atteinte pour Perceptron, PA, Confidit et BPA. Seul Banditron présente une courbe croissante qui ne permet pas de borner le taux d'erreurs cumulées.  On constate également, comme prévu, un taux d'erreur total plus faible pour les algorithmes supervisés que pour les algorithmes à feedback de Bandit.
 
-\begin{figure}[h!]
-	\centerline{
-		\includegraphics[width=\linewidth]{figs/SynNonSep_gamma.eps}}
-	\caption{Average error of Banditron and BPA for parameter's value $\epsilon$ on the data set of SynNonSep. }
-	\label{pic:BPASNSerr}
-\end{figure}
+Dans le cas de SynNonSep, le taux de croissance de l'erreur cumulée est linéaire, du fait du bruit de label de 5\% qui ne permet pas de supprimer les erreurs de classification. On constate ici une plus faible sensibilité des algorithmes Confidit et BPA au bruit de label, avec une pente plus faible que pour les algorithmes supervisés.
 
-\begin{figure}[h!]
-	\centerline{
-		\includegraphics[width=\linewidth]{figs/Reuters_gamma.eps}}
-	\caption{Average error of Banditron and BPA for parameter's value $\epsilon$ on the data set of Reuters.}
-	\label{pic:BPARCVerr}
-\end{figure}
+%\textcolor{red}{OK-- Il manque les valeurs des paramètres pour les différents algorithmes (faire un tableau comme dans la partie précédente).}
 
-\begin{figure}[h!]
-	\centerline{
-		\includegraphics[width=\linewidth]{figs/10LR_gamma.eps}}
-	\caption{Average error of Banditron and BPA for parameter's value $\epsilon$ on the data set of Letter Recognition.}
-	\label{pic:BPALRerr}
-\end{figure}
+Enfin, la base Reuters, qui présente le cas de figure le plus réaliste, permet de mettre en évidence les bonnes performances de l'approche BPA. Dans tous les cas, les taux d'erreurs cumulés sont croissants mais la croissance est sous linéaire, indiquant une bon comportement d'apprentissage pour tous les algorithmes. Les deux algorithmes supervisés présentent des performances comparables, avec un taux d'erreurs cumulées légèrement plus faible  que confidit et BPA, et des pentes finales à peu près comparables. Le résultat le plus saisissant ici est de constater les performances des algorithmes BPA et Confidit, très proches de celles des algorithmes supervisés malgré le nombre de classes élevé (53). Le taux d'erreurs cumulées se révèle par ailleurs un peu plus favorable pour BPA que pour Confidit, ce qui est également notable étant donnée la moindre complexité algorithmique de l'algorithme BPA \footnote{L'algorithme Confidit nécessite en effet une estimation de la covariance des échantillons, cette matrice de covariance étant réduite en haute dimension à une simple diagonale.}. Seul l'algorithme du Banditron semble encore une fois présenter une performance d'apprentissage significativement plus faible. 
 
 
-\subsection{Non-linearly separable datasets}
+Dans le cas de jeux de données de petite dimension, nous comparons le comportement des algorithmes dans el cas du plongement des données dans des espaces de fonctions noyaux. Nous notons ainsi KBanditron le Banditron à noyaux, KBPA le Bandit Passif Agressif à noyaux et KSGD l'approche basée sur la descente de gradient régularisée présenté dans la partie 2.3. Nous ne présentons pas ici l'algorithme Confidit pour lequel la généralisation aux espaces de fonctions noyaux est moins directe. 
 
-In this section, we take two datasets to evaluate and analyze the effect of these algorithm in Reproducing Kernel Hilbert Space.
-
-\vspace{1.5ex}
-\textbf{Data description}
-
-\vspace{1.5ex}
-%\textcolor{red}{OK-- Il faut donner la formule des noyaux lineaire et Laplace}
-\textbf{Algorithm}
-Here, we take algorithms Banditron (in RKHS), KBPA and KSGD to compare. In order to perform the effect of RKHS, we choose KBPA in linear model as the reference object and choose \textbf{Laplace} for the kernel function. Its form looks like the following formulate.
+La fonction noyau utilisée dans ce cadre est la fonction de Laplace, soit~:
 \[K_{Laplace}(x,y) = \exp{\left(-\frac{\parallel{x-y}\parallel}{\sigma}\right)}\]
-So, all participant algorithms contains: KBanditron, KBPA (linear), KBPA (Laplace), and KSGD (Laplace). For each dataset, the parameter of kernel function is different. By cross-validation way, we choose $\eta = 1$ of model `Laplace' for dataset Pendigits and $\eta = 10$ for dataset `Segment'. For KSGD, the truncated number is 500 for dataset Pendigits, and 200 for Segment.
+Les paramètres sont donnés dans la table 2. 
 
-\vspace{1.5ex}
-\textbf{Result}
-We mainly analyze these experiments from the following aspects. 
+Dans la cas de l'apprentissage en ligne, le nombre d'exemplaires supports des classifieurs croît au cours de l'apprentissage, ce qui tend faire croître le temps de calcul. Nous mesurons ainsi croissance du taux temps de calcul au cours de l'apprentissage pour les différents algorithmes considérés. Soit $c_t$ le temps de calcul à l'instant $t$.  Le temps de calcul moyen est calculé comme~: 
+$$\bar{c}_t = \frac{1}{100} \sum_{t'=t - 99}^t c_{t^\prime}$$
 
-Average training time for each instance:  we observe the training time of every instance $\{t_1,t_2,\dots,t_n\}$; then divide 100 ordering examples into one group $g_1 = \{t_1,\dots,t_{100}\}$,
-$\dots$, $g_i = \{t_{1+100*(i-1)},\dots, t_{100*i}\}$; finally, the average training time for instances of group $g_i$ can be calculated by $\overline{t_i} = \frac{1}{100}\sum_{s=1+100*(i-1)}^{100*i} t_s$. 
-
-Average error rate: $e_i = \sum_{s=1+100*(i-1)}^{100\times i}\mathbf{1}_{\hat{y}_t = y_t}/100$ this measure is calculated by the same way.
-
-Cumulative Errors: calculate the total number of past errors.
-
-In Figure~\ref{pic:PKT}, it gives the result of average training time on based dataset ``Pendigits''.  From this result, the training time of three kernel algorithms increases linearly along with the number of training instances. Only the linear model is stable. From the theoretical perspective, Banditron always adds a new example passively for its support vector. Algorithm KSGD only adds a new example for its support vector if its classifier makes a bad prediction, otherwise the number of support vector is limited by the truncated parameter. Algorithm KBPA adds a new example for its support vector if and only if its predicted loss not equals to zero. So its number of support vector will increase all the time until it can make good prediction with no loss.
-
-In Figure~\ref{pic:PKM} and Figure~\ref{pic:PKCM}, accumulative errors of algorithm KBPA firstly tend to a stable, others still increase linearly. That is because KBPA accumulates all good support vectors, KSGD only accumulates several recent support vectors and Kernel Banditron always accumulates new instance as negative support vector.
-
-In Figure~\ref{pic:SKT}, it is about the average training time on dataset ``Segment''.  The training time of Kernel Banditron still increases linearly, while the training time of KSGD and KBPA are as stable as linear model after a small period of increasing linearly. KSGD reaches the limited number of support vector, and KBPA quickly gets enough support vectors to make a good prediction. It could show that this dataset is separable. 
-
-In Figure~\ref{pic:SKM} and Figure~\ref{pic:SKCM}, we can observe that KBPA and KSGD performed obviously better than the other two.  Two kernel algorithms have ability to solve non-linear classification with Bandit Feedback. Considering the scale of classifier, we can use more efficient algorithm KBPA if dataset is separable, otherwise we use KSGD.
 
 \begin{figure}[h!]
 	\includegraphics[width=\linewidth]{figs/Pendigits_kernel_T.png}
 	\caption{Average training time for each instance of Data Pendigits.}
 	\label{pic:PKT}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width=\linewidth]{figs/Segment_kernel_T.png}}
+	\caption{Average training time for each instance of Data Segment.}
+	\label{pic:SKT}
+\end{figure}
+
+Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de calcul pour les différents algorithmes considérés sur les bases Pendigit  et Segment.  Le BPA linéaire présente comme attendu un temps de calcul indépendant du temps. On constate ensuite des temps de calcul croissants pour les trois algorithmes à noyaux. La croissance la plus forte (corissance linéaire) est observée comme attendu dans le cas du Banditron qui ajoute un exemplaire à la base des vecteurs supports à chaque nouvel essai. L'algorithme BPA présente une croissance moins marquée du nombre de vecteurs supports, du fait de la fonction de coût de type ``hinge loss'' qui permet d'ignorer les exemplaires ne produisant pas de perte.  on constate en particulier sur la base Segment une tendance à la stabilisation du temps de calcul. Enfin l'algorithme KSGD indique un temps de calcul de croissance significativement plus faible, du fait du principe de troncature utilisé. Dans le cas de la base Segments, les performances des deux algorithmes s'avèrent néanmoins très proches, indiquant la bonne parcimonie de l'algorithme BPA.
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width=\linewidth]{figs/Pendigits_kernel_CM.png}}
+	\caption{Cumulative Errors of Data Pendigits}
+	\label{pic:PKCM}
 \end{figure}
 
 \begin{figure}[h!]
@@ -456,23 +476,9 @@ In Figure~\ref{pic:SKM} and Figure~\ref{pic:SKCM}, we can observe that KBPA and 
 
 \begin{figure}[h!]
 	\centerline{
-		\includegraphics[width=\linewidth]{figs/Pendigits_kernel_CM.png}}
-	\caption{Cumulative Errors of Data Pendigits}
-	\label{pic:PKCM}
-\end{figure}
-
-%\begin{figure}[h!]
-%\label{pic:PKR}
-%\centerline{
-%\includegraphics[scale = 0.4]{fig05/mc/Pendigits_kernel_R.png}}
-%\caption{Cumulative loss of Data Pendigits}
-%\end{figure}
-
-\begin{figure}[h!]
-	\centerline{
-		\includegraphics[width=\linewidth]{figs/Segment_kernel_T.png}}
-	\caption{Average training time for each instance of Data Segment.}
-	\label{pic:SKT}
+		\includegraphics[width=\linewidth]{figs/Segment_kernel_CM.png}}
+	\caption{Cumulative Errors of Data Segment}
+	\label{pic:SKCM}
 \end{figure}
 
 \begin{figure}[h!]
@@ -482,12 +488,20 @@ In Figure~\ref{pic:SKM} and Figure~\ref{pic:SKCM}, we can observe that KBPA and 
 	\label{pic:SKM}
 \end{figure}
 
-\begin{figure}[h!]
-	\centerline{
-		\includegraphics[width=\linewidth]{figs/Segment_kernel_CM.png}}
-	\caption{Cumulative Errors of Data Segment}
-	\label{pic:SKCM}
-\end{figure}
+Les figures  \ref{pic:PKCM}, \ref{pic:PKM}, \ref{pic:SKCM} et \ref{pic:SKM}  présentent enfin les taux d'erreur moyens et cumulés produits par ces différents algorithmes au cours de l'apprentissage des bases Pendigit et Segment. Les courbes d'erreurs cumulées mettent en évidence dans ce cas de l'approche à noyaux sur l'approche linéaire, du fait du caractère non-linéairement séparable des données utilisées. Par ailleurs, l'algorithme BPA présente dans les deux cas les meilleurs performances d'apprentissage que l'algorithme du Banditron. L'algorithme KSGD présente de bonnes performances en début d'apprentissage, mais tend ensuite à atteindre un plateau de performances (du fait de la troncature) tandis que BPA présente une amélioration plus régulière lui permettant de dépasser les performances de KSGD en fin de session. On constate en particulier des taux d'erreurs très faibles en fin de session pour la base Pendigit. Ces performances d'apprentissage sont remarquables du fait de l'absence d'information de classification complète.  
+
+%\begin{figure}[h!]
+%\label{pic:PKR}
+%\centerline{
+%\includegraphics[scale = 0.4]{fig05/mc/Pendigits_kernel_R.png}}
+%\caption{Cumulative loss of Data Pendigits}
+%\end{figure}
+
+
+
+
+
+
 
 %\begin{figure}[h!]
 %\label{pic:SKR}
@@ -501,13 +515,19 @@ In Figure~\ref{pic:SKM} and Figure~\ref{pic:SKCM}, we can observe that KBPA and 
 {Conclusion}
 \label{subsec:BPAC}
 
+Nous avons proposé dans cet article un nouvel algorithme d'apprentissage en ligne de classifieurs multiclasses adaptés au cas où l'information de classification se présente sous une forme binaire (on parle de feedback de bandit). Nous développons une approche fondée sur l'optimisation à chaque essai d'une fonction de coût spécifique au problème, sur le modèle de l'approche ``Passive Agressive'' proposée par \cite{crammer2006online}. 
+
 We proposed a novel algorithm for online multiclass classification with bandit feedback. By the advantage of PA max-margin principle, BPA appears effective to address the bandit online learning setting. Its main advantage is its linear complexity in space that allows to deal with high dimensional data sets and a large number of classes, on the contrary to second-order methods. The practicability of this algorithm is verified theoretically by showing a competitive loss bound.
 
 Moreover, experimental evaluation shows that BPA performs better than other algorithms on  real datasets, even better than the algorithms with full feedback on the data sets non-separable.
 
+- nb de classes élevé
+- grande taille
+- parimonie
 
 la conclusion est qu’une information minimale (binaire) offre des capacites de convergence comparable en ordre de grandeur à une information complète.
 
+role de epsilon
 
 \bibliography{cap2016}
 
