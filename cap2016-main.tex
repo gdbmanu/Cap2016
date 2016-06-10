@@ -90,7 +90,7 @@ Crammer montre que dans le cas linéairement séparable, la somme des pertes au 
 \subsection{Principe}
 L'approche adoptée dans le cadre de cet article est une généralisation assez directe des principes d'optimisation quadratique en ligne proposés par Crammer au cas des bandits contextuels. Cette extension nécessite de définir une fonction de perte spécifique. 
 
-Soit un classifieur linéaire défini à l'essai $t$ par le jeu de paramètres $W_{t-1}$. Après avoir observé l'exemplaire $x_t$, le choix $\tilde{y}_t$ repose sur un tirage selon la distribution: $$P(\tilde{Y}=k) = (1 - \varepsilon) \mathbf{1}_{k = \hat{y}} + \frac{\varepsilon}{K} $$ avec $\varepsilon \in [0,1]$ le paramètre d'exploration, et $\hat{y}$ la catégorie correspondant au meilleure score des produits salaires entre entre l'exemplaire et les différentes séparatrices.  
+Soit un classifieur linéaire défini à l'essai $t$ par le jeu de paramètres $W_{t-1}$. Après avoir observé l'exemplaire $x_t$, le choix $\tilde{y}_t$ repose sur un tirage selon la distribution: $$P(\tilde{Y}=k) = (1 - \varepsilon) \mathbf{1}_{k = \hat{y}} + \frac{\varepsilon}{K} $$ avec $\varepsilon \in [0,1]$ le paramètre d'exploration, et $\hat{y}$ la catégorie correspondant au meilleur score des produits salaires entre entre l'exemplaire et les différentes séparatrices.  
 
 Après avoir émis la proposition $\tilde{y}_t$, l'apprenant reçoit un gain $g_t$ égal à 1 si la catégorie proposée est correcte et 0 sinon, soit $g_t = \mathbf{1}_{\tilde{y}_t=y_t}$. 
 
@@ -108,76 +108,78 @@ La résolution du problème d'optimisation suivant~:
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
 où $C$ correspond au paramètre de raideur, conduit à la mise à jour~:
 $$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) \Phi(x_t,\tilde{y}_t)$$
-
-\paragraph{Bandit Passive-Aggressive (BPA)}
+(voir \cite{crammer2006online} pour plus de détails)
+%\paragraph{Bandit Passive-Aggressive (BPA)}
 	%\caption{BPA}
+\begin{algorithm}
+	\caption{Bandit Passive Aggressive (BPA)}\label{algo:BPA}
 	\begin{algorithmic}
 		\STATE $\ \ $
-		\STATE Parameters:  $\varepsilon$, $C$.
-		\STATE Set $W_0 = 0$ (null vector)
-		\FOR {each round $t$ = 1,\dots, $T$}
-		\STATE Observe $x_t$.
-		\STATE Set $\hat{y}_t = \underset{i = 1,\dots,K}{\text{argmax}}\left\langle W_{t-1} ,\Phi(x_t,i)\right\rangle$
-		\FORALL {$i \in [1,...,K]$}
-		\STATE $p_{i,t}= (1-\varepsilon)\mathbf{1}_{i = \hat{y}_t} + \frac{\varepsilon}{K}$
+		\STATE paramètres:  $\varepsilon$, $C$.
+		\STATE $W_0 \leftarrow 0$ (vecteur nul)
+		\FOR {$t$ = 1,\dots, $T$}
+		\STATE Lire $x_t$.
+		\STATE Etablir $\hat{y}_t = \underset{i = 1,\dots,K}{\text{argmax}}\left\langle W_{t-1} ,\Phi(x_t,i)\right\rangle$
+		\FOR {$i = 1,...,K$}
+		\STATE $p_{i,t}\leftarrow (1-\varepsilon)\mathbf{1}_{i = \hat{y}_t} + \frac{\varepsilon}{K}$
 		\ENDFOR
-		\STATE Draw $\tilde{y}_t$ randomly from $p_t = \left(p_{1,t},\dots ,p_{K,t}\right)$.
-		\STATE Observe $g_t = \mathbf{1}_{(\tilde{y}_t=y_t)}$.
-		\STATE Set $l_t = [ 1+(1-2g_t)\left\langle W_{t-1},\Phi(x_t,\tilde{y}_t)\right\rangle]_{+}$ 
-		\STATE $W_t = W_{t-1} + (2g_t-1)\frac{l_t}{\parallel\Phi(x_t,\tilde{y}_t)\parallel^2 + \frac{1}{2C}}\cdot\Phi(x_t,\tilde{y}_t)$
+		\STATE Choisir aléatoirement $\tilde{y}_t$ selon $p_t = \left(p_{1,t},\dots ,p_{K,t}\right)$
+		\STATE Lire $g_t = \mathbf{1}_{(\tilde{y}_t=y_t)}$
+		\STATE $l_t \leftarrow [ 1+(1-2g_t)\left\langle W_{t-1},\Phi(x_t,\tilde{y}_t)\right\rangle]_{+}$ 
+		\STATE $W_t \leftarrow W_{t-1} + (2g_t-1)\frac{l_t}{\parallel\Phi(x_t,\tilde{y}_t)\parallel^2 + \frac{1}{2C}}\cdot\Phi(x_t,\tilde{y}_t)$
 		\ENDFOR
 	\end{algorithmic}
-
+\end{algorithm}
 
 \subsection{Analyse}
-Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$. On démontre les deux théorèmes suivants (en négligeant la constante de raideur $C$ pour simplifier) :
+Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$. On démontre les deux théorèmes suivants (en négligeant la constante de raideur, soit $C\rightarrow \infty$, pour simplifier) :
 
 \begin{theorem}
 	\label{theo:BPAT1}
-	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, and $U \in \mathbb{R}^{K\times d}$ such that $ \forall t, l^*_t=0$. Then, the cumulative squared loss of this algorithm is bounded by,
+	Soit $(x_1,y_1),...,(x_T,y_T)$ une séquence d'exemples linéairement séparables où $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ et $\parallel x_t \parallel\leqslant R$ pour tout $t$, et $U \in \mathbb{R}^{K\times d}$ tel que $ \forall t, l^*_t=0$. Alors, la perte au carré cumulée de l'algorithme \ref{algo:BPA} est bornée par:
 	\begin{equation}
 	\sum_{t=1}^{T} l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2
 	\end{equation}
 \end{theorem}
 
 \begin{proof}
-	Define $\Delta_t$ to be:
+	Soit $\Delta_t$ telle que:
 	\[\Delta_t = \parallel{W_{t-1}-U}\parallel^2-\parallel{W_t-U}\parallel^2\]
-	By summing $\Delta_t$ over all $t$ from 1 to $T$,  $\sum_t \Delta_t$ is shown to be a telescopic sum which collapses to
+	La somme de 1 à $T$ des $\Delta_t$  se réduit à:
 	\begin{align}
     \sum_{t=1}^{T}\Delta_t &= \sum_{t=1}^{T} \left( \parallel{W_{t-1} - U}\parallel^2-\parallel{W_t - U}\parallel^2 \right)\nonumber\\ 
-    &= \parallel{W_0 - U}\parallel^2-\parallel{W_t-U}\parallel^2\nonumber
+    &= \parallel{W_0 - U}\parallel^2-\parallel{W_T-U}\parallel^2\nonumber
 	\end{align}	
-	By the initiation of $W_0 = \vec{0}$, 
+	Sachant que $W_0 = \vec{0}$, 
 	\begin{equation}
 	\label{equa:delta}
-	\sum_{t=1}^{T}\Delta_t = \parallel{U}\parallel^2 - \parallel{W_t-U}\parallel^2 \leqslant \parallel{U}\parallel^2 
+	\sum_{t=1}^{T}\Delta_t = \parallel{U}\parallel^2 - \parallel{W_T-U}\parallel^2 \leqslant \parallel{U}\parallel^2 
 	\end{equation}
 	
-	Using the definition of update : %in Eq.\ref{eq:,
+	En utilisant la définition de la mise à jour~: %in Eq.\ref{eq:,
 	\begin{align}
 	\Delta_t =& -2\left\langle (W_{t-1} - U), (2g_t-1)\frac{l_t}{\parallel{x_t}\parallel^2}\Phi(x_t,\tilde{y}_t)\right\rangle \nonumber\\
 	&- \left\| \frac{l_t}{\parallel{x_t}\parallel^2}\Phi(x_t,\tilde{y}_t)\right\|^2
 	\nonumber
 	\end{align}
 	%With    and   ,
-	So, remarking that~:
+	et en remarquant que~:
 	\begin{itemize}
-		\item[] $l_t = [1+(1-2g_t)\cdot\langle W_{t-1},\Phi(x_t,\tilde{y}_t)\rangle]_+$
-		\item[] $l_t^{\ast} = [1+(1-2g_t)\cdot\langle U,\Phi(x_t,\tilde{y}_t)\rangle]_+$
+		\item[] $l_t = [1+(1-2g_t)\langle W_{t-1},\Phi(x_t,\tilde{y}_t)\rangle]_+$
+		\item[] $l_t^{\ast} = [1+(1-2g_t)\langle U,\Phi(x_t,\tilde{y}_t)\rangle]_+$
 		\item[] $\parallel{\Phi(x_t,\tilde{y}_t)}\parallel = \parallel x_t\parallel$
 	\end{itemize}
-	it comes:
+	on obtient:
 	\begin{align}
 	\Delta_t =& 2l_t\frac{(1-2g_t)\langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle - (1-2g_t)\langle U, \Phi(x_t,\tilde{y}_t)\rangle}{\|x_t\|^2} \nonumber\\
 	&-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel{\Phi(x_t,\tilde{y}_t)}\parallel \right)^2\nonumber
 	\end{align}
-	Noting that $\Delta_t = 0$ when $l_t = 0$, and $l^*_t \geq  1+(1-2g_t)\cdot\langle U,\Phi(x_t,\tilde{y}_t)\rangle$, it comes : 
+	Sachant que $\Delta_t = 0$ quand $l_t = 0$, et $l^*_t \geq  1+(1-2g_t)\cdot\langle U,\Phi(x_t,\tilde{y}_t)\rangle$, on obtient : 
 	\begin{align}
 	\Delta_t\geqslant& 2l_t\frac{l_t - l_t^{\ast}}{\parallel{x_t}\parallel^2}-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel x_t\parallel \right)^2\nonumber\\
 	=& \frac{l_t^2-2l_t l_t^{\ast}}{\parallel x_t\parallel^2}\nonumber
 	\end{align}
-	If all examples are separable, $\exists U$ such that $\forall t \in [1,...,T]$ , $l_t^{\ast} = 0$ ,
+Sachant que $U$ est tel que $\forall t \in [1,...,T]$ , $l_t^{\ast} = 0$ ,
 	%, following the Eq.~\ref{sumDelta},
 	
 	\[\Rightarrow \parallel{U}\parallel^2 \geqslant \sum_{t=1}^{T}\Delta_t \geqslant \sum_{t=1}^{T}  \frac{l_t^2}{\parallel{x_t}\parallel^2}
@@ -188,13 +190,13 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 \end{proof}
 \begin{theorem}
 	\label{theo:BPAT2}
-	Let $(x_1,y_1),...,(x_T,y_T) $ be a sequence of examples where  $x_t\in \mathbb{R}^d$, $y_t \in \{1,...,K\}$ and $\parallel{x_t}\parallel \leqslant R$ for all t. Then for any  $U \in \mathbb{R}^{K\times d}$, the cumulative squared loss of this algorithm is bounded by:
+	Soit $(x_1,y_1),...,(x_T,y_T) $ une séquence d'exemples telle que   $x_t\in \mathbb{R}^d$, $y_t \in \{1,...,K\}$ et $\parallel{x_t}\parallel \leqslant R$ pour tout $t$. Alors, quel que soit  $U \in \mathbb{R}^{K\times d}$, la perte a carré cumulée de  l'algorithme \ref{algo:BPA} est bornée par:
 	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
 \end{theorem}
 \begin{proof}
-	By the proof of Theorem \ref{theo:BPAT1}, 
+	Un résultat intermédiaire du théorème \ref{theo:BPAT1} indique que: 
 	\[\sum_{t=1}^{T}l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2 + 2\sum_{t=1}^{T}l_t l_t^{\ast}\]
-	To upper bound the right side of the above inequality, we denote $A_t = \sqrt{\sum_{t=1}^{T}l_t^2}$ and $B_t = \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}$, 
+	Pour borner la partie droite de l'inégalité, on note $A_t = \sqrt{\sum_{t=1}^{T}l_t^2}$ et $B_t = \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}$, 
 	\begin{align}
 	2(A_tB_t)^2-2(\sum_{t=1}^{T}l_tl_t^{\ast})^2 =& \sum_{i=1}^{T}\sum_{j=1}^{T}l_i^2(l_j^{\ast})^2+\sum_{i=1}^{T}\sum_{j=1}^{T}l_j^2(l_i^{\ast})^2 \nonumber\\
 	&- 2\sum_{i=1}^{T}\sum_{j=1}^{T}l_il_jl_i^{\ast}l_j^{\ast}\nonumber\\
@@ -204,20 +206,20 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 	\begin{align}
 	\sum_{t=1}^{T}l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2+2\sum_{t=1}^{T}l_tl_t^{\ast}\leqslant R^2 \cdot \parallel{U}\parallel^2+2A_tB_t\nonumber
 	\end{align}
-	then considering:
+	puis, sachant que~:
 	\[A_t^2 -2 A_tB_t+B_t^2\leqslant R^2\parallel{U}\parallel^2+B_t^2\]
-	we obtain :
+	on obtient~:
 	\[A_t \leqslant B_t+\sqrt{R^2\parallel{U}\parallel^2+B_t^2}\]
-	and using the fact that $\sqrt{a+b}\leqslant \sqrt{a}+\sqrt{b}$,
+	et en utilisant le fait que~: $\sqrt{a+b}\leqslant \sqrt{a}+\sqrt{b}$,
 	\[A_t \leqslant R\parallel{U}\parallel+2 B_t\]
-	so that :
+	on obtient~:
 	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
 \end{proof}
 
 %Pour les affiliations, vous pouvez utiliser
 %\href{http://ctan.org/pkg/authblk}{le paquet \texttt{authblk}}.
 
-Les bornes obtenues ici sont comparables  à celles obtenues par Crammer dans le cadre de la classification supervisée  \cite{crammer2006online}. En particulier, comme dans le cas de l'algorithme ``passif-agressif'' de Crammer, on peut s'attendre à un regret de l'ordre de $O(\sqrt{T})$ dans le cas non-linéairement séparable. Il est donc remarquable de constater que les garanties de convergences de notre algorithme sont les mêmes que dans le cas supervisé, étant donnée la moindre information utilisée et le caractère stochastique de la fonction de décision. On notera néanmoins le caractère plus ``faible'' de la fonction de perte utilisée, de sorte que nos résultats ne garantissent pas que la bonne réponse sera atteinte, mais seulement que la mauvaise réponse ne sera pas atteinte.
+Les bornes obtenues ici sont comparables  à celles obtenues par Crammer dans le cadre de la classification supervisée  \cite{crammer2006online}. Il est à noter que la prise en compte du terme de régularisation $C$ devrait permettre, sous certaines conditions, d'atteindre  un regret de l'ordre de $O(\sqrt{T})$ dans le cas non-linéairement séparable (ce résultat n'est pas développé ici). Il est par ailleurs remarquable de constater que les garanties de convergences de notre algorithme sont les mêmes que dans le cas supervisé, étant donnée la moindre information utilisée et le caractère stochastique de la fonction de décision. On notera néanmoins le caractère plus ``faible'' de la fonction de perte utilisée, de sorte que nos résultats ne garantissent pas que la bonne réponse sera atteinte, mais seulement que la mauvaise réponse ne sera pas atteinte.
 
 \subsection{Extensions}
 Le plongement des données d'entrée dans des espaces de Hilbert à noyaux reproduisants (RKHS) permet d'étendre notre approche aux jeux de données non linéairement séparables. 
@@ -430,7 +432,7 @@ Par ailleurs, dans les deux cas, le taux d'erreurs obtenu par BPA en fin de sess
 	\centerline{
 		\includegraphics[width=\linewidth]{figs/SynSep.eps}
 	}
-	\caption{Cumulative Errors on the synthetic data set of  SynSep.}
+	\caption{Erreurs cumulées sur le jeu de données synthétique SynSep.}
 	\label{pic:BPASS}
 \end{figure}
 \begin{figure}[ht!]
@@ -438,13 +440,13 @@ Par ailleurs, dans les deux cas, le taux d'erreurs obtenu par BPA en fin de sess
 	\centerline{
 		\includegraphics[width=\linewidth]{figs/SynNonSep.eps}
 	}
-	\caption{Cumulative Errors on the synthetic data set of SynNonSep.}
+	\caption{Erreurs cumulées sur le jeu de données synthétique SynNonSep.}
 	\label{pic:BPASNS}
 \end{figure}
 \begin{figure}[ht!]
 	\centerline{
 		\includegraphics[width=\linewidth]{figs/RCV1_v2_53class.eps}}
-	\caption{Cumulative Errors  on the real data set of RCV1-v2 (53 classes).}
+	\caption{Erreurs cumulées sur le jeu de données réel RCV1-v2 (53 classes).}
 	\label{pic:BPARCV}
 \end{figure}
 
@@ -467,26 +469,26 @@ Les paramètres sont donnés dans la table 2.
 
 \begin{figure}[t!]
 	\includegraphics[width=\linewidth]{figs/Pendigits_kernel_T.png}
-	\caption{Average training time for each instance of Data Pendigits.}
+	\caption{Temps de simulation moyen pour le jeu de données Pendigits.}
 	\label{pic:PKT}
 \end{figure}
 
 \begin{figure}[t!]
 	\centerline{
 		\includegraphics[width=\linewidth]{figs/Segment_kernel_T.png}}
-	\caption{Average training time for each instance of Data Segment.}
+	\caption{Temps de simulation moyen pour le jeu de données Data Segment.}
 	\label{pic:SKT}
 \end{figure}
 
-Dans la cas de l'apprentissage en ligne, le nombre d'exemplaires supports des classifieurs croît au cours de l'apprentissage, ce qui tend faire croître le temps de calcul. Nous mesurons ainsi croissance du taux temps de calcul au cours de l'apprentissage pour les différents algorithmes considérés. Soit $c_t$ le temps de calcul à l'instant $t$.  Le temps de calcul moyen est calculé comme~: 
+Dans le cas de l'apprentissage en ligne, le nombre d'exemplaires supports des classifieurs croît au cours de l'apprentissage, ce qui tend faire croître le temps de calcul. Nous mesurons ainsi croissance du taux temps de calcul au cours de l'apprentissage pour les différents algorithmes considérés. Soit $c_t$ le temps de calcul à l'instant $t$.  Le temps de calcul moyen est calculé comme~: 
 $$\forall t>99, \bar{c}_t = \frac{1}{100} \sum_{t'=t - 99}^t c_{t^\prime}$$
 
-Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de calcul pour les différents algorithmes considérés sur les bases Pendigit  et Segment.  Le BPA linéaire présente comme attendu un temps de calcul indépendant du temps. On constate ensuite des temps de calcul croissants pour les trois algorithmes à noyaux. La croissance la plus forte (corissance linéaire) est observée comme attendu dans le cas du Banditron qui ajoute un exemplaire à la base des vecteurs supports à chaque nouvel essai. L'algorithme BPA présente une croissance moins marquée du nombre de vecteurs supports, du fait de la fonction de coût de type ``hinge loss'' qui permet d'ignorer les exemplaires ne produisant pas de perte.  on constate en particulier sur la base Segment une tendance à la stabilisation du temps de calcul. Enfin l'algorithme KSGD indique un temps de calcul de croissance significativement plus faible, du fait du principe de troncature utilisé. Dans le cas de la base Segments, les performances des deux algorithmes s'avèrent néanmoins très proches, indiquant la bonne parcimonie de l'algorithme BPA.
+Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de calcul pour les différents algorithmes considérés sur les bases Pendigit  et Segment.  Le BPA linéaire présente comme attendu un temps de calcul indépendant du temps. On constate ensuite des temps de calcul croissants pour les trois algorithmes à noyaux. La croissance la plus forte (croissance linéaire) est observée comme attendu dans le cas du Banditron qui ajoute un exemplaire à la base des vecteurs supports à chaque nouvel essai. L'algorithme BPA présente une croissance moins marquée du nombre de vecteurs supports, du fait de la fonction de coût de type ``hinge loss'' qui permet d'ignorer les exemplaires ne produisant pas de perte.  on constate en particulier sur la base Segment une tendance à la stabilisation du temps de calcul. Enfin l'algorithme KSGD indique un temps de calcul de croissance significativement plus faible, du fait du principe de troncature utilisé. Dans le cas de la base Segments, les performances des deux algorithmes s'avèrent néanmoins très proches, indiquant la bonne parcimonie de l'algorithme BPA.
 
 \begin{figure}[t!]
 	\centerline{
 		\includegraphics[width=\linewidth]{figs/Pendigits_kernel_CM.png}}
-	\caption{Cumulative Errors of Data Pendigits}
+	\caption{Erreurs cumulées sur le jeu de données réelles Pendigits}
 	\label{pic:PKCM}
 \end{figure}
 
@@ -500,7 +502,7 @@ Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de 
 \begin{figure}[t!]
 	\centerline{
 		\includegraphics[width=\linewidth]{figs/Segment_kernel_CM.png}}
-	\caption{Cumulative Errors of Data Segment}
+	\caption{Erreurs cumulées sur le jeu de données réelles Segment}
 	\label{pic:SKCM}
 \end{figure}
 
@@ -514,7 +516,7 @@ Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de 
 Les figures  \ref{pic:PKCM} %, \ref{pic:PKM}, 
 et \ref{pic:SKCM} 
 %et \ref{pic:SKM}  
-présentent enfin les taux d'erreur moyens et cumulés produits par ces différents algorithmes au cours de l'apprentissage des bases Pendigit et Segment. Les courbes d'erreurs cumulées mettent en évidence dans ce cas de l'approche à noyaux sur l'approche linéaire, du fait du caractère non-linéairement séparable des données utilisées. Par ailleurs, l'algorithme BPA présente dans les deux cas les meilleurs performances d'apprentissage que l'algorithme du Banditron. L'algorithme KSGD présente de bonnes performances en début d'apprentissage, mais tend ensuite à atteindre un plateau de performances (du fait de la troncature) tandis que BPA présente une amélioration plus régulière lui permettant de dépasser les performances de KSGD en fin de session. On constate en particulier des taux d'erreurs très faibles en fin de session pour la base Pendigit. Ces performances d'apprentissage sont remarquables du fait de l'absence d'information de classification complète.  
+présentent enfin les taux d'erreur moyens et cumulés produits par ces différents algorithmes au cours de l'apprentissage des bases Pendigit et Segment. Les courbes d'erreurs cumulées mettent en évidence dans ce cas la supériorité de l'approche à noyaux sur l'approche linéaire, du fait du caractère non-linéairement séparable des données utilisées. Par ailleurs, l'algorithme BPA présente dans les deux cas les meilleurs performances d'apprentissage que l'algorithme du Banditron. L'algorithme KSGD présente de bonnes performances en début d'apprentissage, mais tend ensuite à atteindre un plateau de performances (du fait de la troncature) tandis que BPA présente une amélioration plus régulière lui permettant de dépasser les performances de KSGD en fin de session. On constate en particulier des taux d'erreurs très faibles en fin de session pour la base Pendigit. Ces performances d'apprentissage sont remarquables du fait de l'absence d'information de classification complète.  
 
 %\begin{figure}[h!]
 %\label{pic:PKR}
