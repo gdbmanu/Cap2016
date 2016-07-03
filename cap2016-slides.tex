@@ -1,0 +1,167 @@
+\documentclass{beamer}
+\usecolortheme{whale}
+\usecolortheme{orchid}
+\useinnertheme[shadow=false]{rounded}
+\useoutertheme[footline=authortitle]{miniframes}
+
+\usepackage{multimedia}
+
+\usepackage[french]{babel}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{multimedia}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\title[CAP 2016]
+{Optimisation quadratique pour l'apprentissage en ligne d'un bandit contextuel} 
+%\subtitle{Day 1 : Encoding and signal processing with neural assemblies : definitions, models, simulations, experiments}
+
+\author{Hongliang Zhong$^1$ et Emmanuel Daucé$^2$}
+
+\institute{1. Aix Marseille Univ, CNRS, Centrale Marseille, LIF, Laboratoire d'Informatique Fondamentale, Marseille, France \\
+2. Aix Marseille Univ, Inserm, INS, Institut de Neurosciences des Systèmes, Marseille, France}
+
+\date{5 Juillet 2014}
+
+\begin{document}
+
+\begin{frame}\titlepage
+\end{frame}
+
+\begin{frame}\frametitle{Aprentissage en ligne}
+%Processus d'apprentissage pour lequel se répètent les opérations suivantes~:
+\begin{exampleblock}{}
+Pour tout $t \in 1,... T$~:
+\begin{enumerate}
+	\item Lire  le vecteur d'observation $x_t \in \mathbb{R}^d$
+	\item Choisir une réponse (étiquette) $\tilde{y}_t \in \{1,...,K\}$ %selon $\Pi_{t-1}$ (politique).
+	\item Lire l'information (feedback) $f_t$
+	\item Mettre à jour le classifieur $W_t$
+\end{enumerate}
+\end{exampleblock}
+
+Problèmes en lien avec ce formalisme :
+\begin{itemize}
+	\item Bandits contextuels \cite{lai1985asymptotically,auer2002finite}
+	\item Apprentissage en ligne supervisé \cite{rosenblatt1958perceptron,duda1973pattern}
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}\frametitle{Univers actionnables (Bandit problem)}
+	\begin{itemize}
+		\item Exemple des machines à sous : répertoire d'actions
+		\item Apprentissage actif : 
+		\begin{itemize}
+			\item Apprendre les conséquences
+			\item L'univers est sondé à travers des actions
+			\item Approche séquentielle par essais/erreurs
+		\end{itemize}
+		\item Chaque action $y$ apporte:
+		\begin{itemize}
+			\item une gratification (gain) $g$
+			\item qui constitue une \textit{information} permettant de mettre à jour un \textit{modèle} $E(g|y)$
+		\end{itemize}
+		\item Dilemme exploration/exploitation
+		\item Notion de regret :
+		$$ \sum_{t \in 1,..,T} g^*_t - g_t$$ 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Classifieurs linéaires}
+	\begin{itemize}
+		\item Tâche : identifier des caractère, des visages, des objets ...
+		\item Observation / espace des observations : $x \in \mathbb{R}^d $ 
+		\item Hypothèse : 
+		\begin{itemize}
+			\item $\exists$ une mesure de similarité sur l'espace des observations 
+			\item des exemplaires d'une même classe  sont "proches" selon cette mesure.
+		\end{itemize}
+		\item Ensemble de $K$ applications linéaires :
+		$$ W = (w_1, ..., w_K)$$
+		\item Choix basé sur la similarité :
+		$$ \langle w_1,x\rangle, ...,   \langle w_K,x\rangle$$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Rôle du feedback}
+ \begin{itemize}
+ 	\item Cas du bandit : 
+ 	\begin{itemize}
+ 		\item feedback quantitatif 
+ 		\item $g$ est une grandeur continue
+ 		\item valeur, bénéfice direct de l'action
+ 	\end{itemize}
+ 	\item Cas des classifieurs~:
+ 	\begin{itemize}
+ 		\item feedback qualitatif /discret :
+ 		\begin{itemize}
+ 			\item consigne explicite : $y$
+ 			\item consigne implicite : "bien"/"pas bien" (1 bit)
+ 		\end{itemize}
+ 		\item une \textit{quantité} $g$ calculée indirectement (fonction de perte)
+ 	\end{itemize}
+ \end{itemize}
+ 
+ \begin{block}{}
+Le couple feedback/fonction de perte constitue le cœur de l'algorithme d'apprentissage.
+ \end{block}
+ 
+\end{frame}
+
+\begin{frame}
+	\frametitle{Le feedback "1 bit" en classification}
+	\begin{itemize}
+		\item Défini par \cite{kakade2008efficient} : ${\color{red}\delta(\tilde{y}_t ,y_t)} \in \{0,1\}$
+		\item Algorithme du "Banditron"
+	\end{itemize}
+	
+	\begin{equation*}\label{eq:argmax}
+	\hat{y}_t = \underset{k \in\{1,..,K\}}{\text{argmax}}  \langle w_{k, t-1}, x_t \rangle
+	\end{equation*}
+	
+	\begin{equation*}\label{eq:eps-greedy}
+	P(\tilde{Y}_t=k) = (1-\varepsilon) \delta(k,\hat{y}_t) + \frac{\varepsilon}{K}
+	\end{equation*}
+	
+	\begin{equation*} \label{eq:banditron-update}
+	W_t = W_{t-1} + \frac{{\color{red}\delta(\tilde{y}_t ,y_t)} X_t^{\tilde{y}_t}}{P(\tilde{Y}_t=\tilde{y}_t)} - X_t^{\hat{y}_t}
+	\end{equation*}   
+	avec:
+	\begin{align*}\label{eq:X}
+	X_t^k \triangleq (\vec{0}, ..., & x_t, ..., \vec{0}) \in \mathbb{R}^{K d}\\
+	&\mid\nonumber\\
+	&k\nonumber
+	\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Alternatives au Banditron}
+	\begin{itemize}
+		\item Bandits contextuels
+		\item Choix basé sur les intervalles de confiance (UCB)
+		\begin{itemize}
+		 \item\cite{li2010contextual}
+		 \item\cite{hazan2011newtron}
+		 \item\cite{crammer2013multiclass}
+		 \item\cite{ngo2013upper}
+		 \end{itemize}
+		\item Regret $O(\sqrt{T})$ dans le cas stationnaire.
+		\item Méthodes du second ordre :
+		\begin{itemize}
+			\item coût $O(d^2)$ en espace
+			\item non sparse
+		\end{itemize}
+	\end{itemize}
+	
+\end{frame}
+	
+
+
+\bibliographystyle{apalike}
+\bibliography{cap2016}
+\end{document}
