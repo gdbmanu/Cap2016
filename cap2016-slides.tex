@@ -31,6 +31,9 @@
 \begin{frame}\titlepage
 \end{frame}
 
+\section{Introduction}
+\subsection{}
+
 \begin{frame}\frametitle{Aprentissage en ligne}
 %Processus d'apprentissage pour lequel se répètent les opérations suivantes~:
 Une organisation séquentielle de l'apprentissage~:
@@ -51,6 +54,70 @@ Problèmes en lien avec ce formalisme :
 \end{itemize}
 
 \end{frame}
+
+\begin{frame}\frametitle{Rôle du feedback}
+	\begin{block}{}
+		Le couple feedback/fonction de perte constitue le cœur de l'algorithme d'apprentissage.
+	\end{block}
+ \begin{itemize}
+ 	\item Cas du bandit : 
+ 	\begin{itemize}
+ 		\item feedback quantitatif 
+ 		\item $g$ est une grandeur continue
+ 		\item gain, bénéfice direct de l'action
+ 	\end{itemize}
+ 	\item Cas des classifieurs~:
+ 	\begin{itemize}
+ 		\item feedback qualitatif /discret :
+ 		\begin{itemize}
+ 			\item consigne explicite : $y$
+ 			\item consigne implicite : "bien"/"pas bien" (1 bit)
+ 		\end{itemize}
+ 		\item une \textit{quantité} $g$ calculée indirectement (fonction de perte)
+ 	\end{itemize}
+ \end{itemize}
+ 
+ 
+ 
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Le feedback "1 bit" en classification multi-classe}
+	
+	\begin{itemize}
+		\item Feedback qualitatif unaire :
+		\begin{itemize}
+			\item réponse en "tout ou rien"
+			\item clic, like, visit, follow, retweet ...
+			\item caractéristique des interactions hommes machines
+		\end{itemize}
+		\item Dans le cadre de la classification en ligne : 
+		\begin{itemize}
+			\item $x_t$ est le contexte, l'étiquette $y_t$ est "cachée"
+			\item La réponse proposée est $\tilde{y}_t$
+			\item $f_t = {\color{red}\delta(\tilde{y}_t ,y_t)} \in \{0,1\}$
+		\end{itemize}
+		\item Méthodes :
+		\begin{itemize}
+			\item Algorithme du "Banditron" \cite{kakade2008efficient}
+			\item Algorithmes de bandits contextuels
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Le feedback "1 bit" dans le développement moteur}
+	\centerline{\includegraphics[width=.7\linewidth]{figs/cap-frog.png}}
+	\begin{itemize}
+		\item apprentissage de compétences motrices
+		\item répertoire d'actions
+		\item gratification en "tout ou rien"
+	\end{itemize}
+\end{frame}
+
+%\section{Classifieurs linéaires}
+%\subsection{}
 
 \begin{frame}\frametitle{Univers actionnables (Bandit problem)}
 	\begin{itemize}
@@ -89,6 +156,77 @@ Problèmes en lien avec ce formalisme :
 		$$ \hat{y} = \underset{k \in 1,...,K}{\text{argmax}}\langle w_k,x\rangle$$
 	\end{itemize}
 \end{frame}
+
+
+\begin{frame}
+	\frametitle{Le Banditron \cite{kakade2008efficient}}
+%	inspiré du Perceptron multiclasse \cite{rosenblatt1958perceptron,duda1973pattern}
+			\begin{exampleblock}{}
+				$
+				\left.
+				\begin{array}{l}
+				W = (w_1,..,w_K) \in \mathbb{R}^{K d}\\
+				X_t^k \triangleq (\vec{0}, ...,  x_t, ..., \vec{0}) \in \mathbb{R}^{K d}
+				\end{array}
+				\right\}
+				\text{ tels que : }
+				\langle W, X^k_t\rangle = \langle w_k, x_t\rangle
+				$
+				
+			\end{exampleblock}
+	\begin{block}{}
+		$\forall t \in 1,...,T :$
+		\begin{align*}
+		&\text{1. Lire } 
+		&& x_t 
+		\\
+		&\text{2. Choisir :} 
+		&& \hat{y}_t = \underset{k \in\{1,..,K\}}{\text{argmax}}  \langle W_{t-1}, X_t^k \rangle 
+		\\
+		& %\text{3. Décision }\tilde{y}_t\text{ : } 
+		&& \tilde{y}_t \sim (1-\varepsilon) \delta(k,\hat{y}_t) + \frac{\varepsilon}{K} 
+		\\	
+		&\text{3. Lire } 
+		&& {\color{red} f_t = \delta(\tilde{y}_t ,y_t)}  
+		\\
+		&\text{4. Mettre à jour :} 
+		&& W_t = W_{t-1} + \frac{{\color{red}f_t}\cdot X_t^{\tilde{y}_t}}{P(\tilde{Y}_t=\tilde{y}_t)} - X_t^{\hat{y}_t} 
+		\end{align*}
+	\end{block}
+	
+\end{frame}
+
+%\section{Modèles probabilistes}
+%\subsection{}
+
+\begin{frame}\frametitle{Intervalles de confiance}
+	\begin{itemize}
+		\item Bandits contextuels
+		\item Choix basé sur :
+		\begin{itemize}
+			\item Les intervalles de confiance (UCB)\cite{lai1985asymptotically}
+			\item Le Perceptron d'ordre 2 \cite{cesa2005second}
+			\item Exemples :
+			\begin{itemize}
+				\item\cite{li2010contextual}
+				\item\cite{hazan2011newtron}
+				\item\cite{crammer2013multiclass}
+				\item\cite{ngo2013upper}
+			\end{itemize}
+		\end{itemize} 
+		\item Regret $O(\sqrt{T})$ dans le cas stationnaire.
+		\item La mise à jour repose sur une estimateur de 
+		$\mathbb{E}\left[ {X_t^{\hat{y}_t}}^\top \cdot X_t^{\hat{y}_t}\right]$:
+		\begin{itemize}
+			\item Coût $O(d^2)$ en espace
+			\item Non sparse
+		\end{itemize}
+	\end{itemize}
+	
+\end{frame}
+
+\section{Contributions}
+\subsection{}
 
 \begin{frame}
 	\frametitle{La perte "Hinge" binaire ($y_t \in \{-1,1\}$)}
@@ -152,118 +290,6 @@ Problèmes en lien avec ce formalisme :
 		$$\sum_{t=1}^{T} l_t^2 \leqslant 4 R^2 \parallel{U}\parallel^2$$
 	\end{itemize}
 \end{frame}
-%\begin{frame}\frametitle{Rôle du feedback}
-% \begin{itemize}
-% 	\item Cas du bandit : 
-% 	\begin{itemize}
-% 		\item feedback quantitatif 
-% 		\item $g$ est une grandeur continue
-% 		\item gain, bénéfice direct de l'action
-% 	\end{itemize}
-% 	\item Cas des classifieurs~:
-% 	\begin{itemize}
-% 		\item feedback qualitatif /discret :
-% 		\begin{itemize}
-% 			\item consigne explicite : $y$
-% 			\item consigne implicite : "bien"/"pas bien" (1 bit)
-% 		\end{itemize}
-% 		\item une \textit{quantité} $g$ calculée indirectement (fonction de perte)
-% 	\end{itemize}
-% \end{itemize}
-% 
-% \begin{block}{}
-%Le couple feedback/fonction de perte constitue le cœur de l'algorithme d'apprentissage.
-% \end{block}
-% 
-%\end{frame}
-
-
-\begin{frame}
-	\frametitle{Le feedback "1 bit" en classification}
-	
-	\begin{itemize}
-		\item Feedback qualitatif unaire :
-		\begin{itemize}
-			\item réponse en "tout ou rien"
-			\item clic, like, visit, follow, retweet ...
-			\item caractéristique des interactions hommes machines
-		\end{itemize}
-		\item Dans le cadre de la classification en ligne : 
-		\begin{itemize}
-			\item $x_t$ est le contexte, l'étiquette $y_t$ est "cachée"
-			\item La réponse proposée est $\tilde{y}_t$
-			\item $f_t = {\color{red}\delta(\tilde{y}_t ,y_t)} \in \{0,1\}$
-		\end{itemize}
-		\item Méthodes :
-		\begin{itemize}
-			\item Algorithme du "Banditron" \cite{kakade2008efficient}
-			\item Algorithmes de bandits contextuels
-		\end{itemize}
-	\end{itemize}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Le feedback "1 bit" dans le développement moteur}
-	\centerline{\includegraphics[width=.7\linewidth]{figs/cap-frog.png}}
-	\begin{itemize}
-		\item apprentissage de compétences motrices
-		\item répertoire d'actions
-		\item gratification en "tout ou rien"
-	\end{itemize}
-\end{frame}
-
-
-\begin{frame}
-	\frametitle{Le Banditron \cite{kakade2008efficient}}
-
-	\begin{block}{}
-		$\forall t \in 1,...,T :$
-		\begin{align*}
-		&\text{1. Lire } 
-		&& x_t 
-		\\
-		&\text{2. Choisir :} 
-		&& \hat{y}_t = \underset{k \in\{1,..,K\}}{\text{argmax}}  \langle W_{t-1}, X_t^k \rangle 
-		\\
-		& %\text{3. Décision }\tilde{y}_t\text{ : } 
-		&& \tilde{y}_t \sim (1-\varepsilon) \delta(k,\hat{y}_t) + \frac{\varepsilon}{K} 
-		\\	
-		&\text{3. Lire } 
-		&& {\color{red} f_t = \delta(\tilde{y}_t ,y_t)}  
-		\\
-		&\text{4. Mettre à jour :} 
-		&& W_t = W_{t-1} + \frac{{\color{red}f_t}\cdot X_t^{\tilde{y}_t}}{P(\tilde{Y}_t=\tilde{y}_t)} - X_t^{\hat{y}_t} 
-		\end{align*}
-	\end{block}
-
-\end{frame}
-
-\begin{frame}\frametitle{Intervalles de confiance}
-	\begin{itemize}
-		\item Bandits contextuels
-		\item Choix basé sur :
-		\begin{itemize}
-			\item Les intervalles de confiance (UCB)\cite{lai1985asymptotically}
-			\item Le Perceptron d'ordre 2 \cite{cesa2005second}
-		\item Exemples :
-		\begin{itemize}
-		 \item\cite{li2010contextual}
-		 \item\cite{hazan2011newtron}
-		 \item\cite{crammer2013multiclass}
-		 \item\cite{ngo2013upper}
-		 \end{itemize}
-		\end{itemize} 
-		\item Regret $O(\sqrt{T})$ dans le cas stationnaire.
-		\item La mise à jour repose sur une estimateur de 
-		$\mathbb{E}\left[ {X_t^{\hat{y}_t}}^\top \cdot X_t^{\hat{y}_t}\right]$:
-		\begin{itemize}
-			\item Coût $O(d^2)$ en espace
-			\item Non sparse
-		\end{itemize}
-	\end{itemize}
-	
-\end{frame}
-	
 
 
 \begin{frame}\frametitle{Perte Hinge : réduction au cas du "bandit"}
@@ -395,6 +421,9 @@ Problèmes en lien avec ce formalisme :
 	\end{exampleblock}
 	\end{footnotesize}	
 \end{frame}
+
+\section{Expériences}
+\subsection{}
 
 \begin{frame}{Expérimentations}
 	\begin{table}[h]
@@ -550,6 +579,8 @@ Problèmes en lien avec ce formalisme :
 	\end{columns}
 \end{frame}
 
+\section{Conclusion}
+\subsection{}
 \begin{frame}{Conclusion}
 	\begin{itemize}
 		\item Passive Aggressive Bandit feedback~:
